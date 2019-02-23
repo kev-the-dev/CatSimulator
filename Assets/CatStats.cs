@@ -1,3 +1,5 @@
+using System;
+
 // Defines the current stats of the cat, which are displayed as bars in the HUD and influence behavior
 public class CatStats
 {
@@ -6,7 +8,7 @@ public class CatStats
 		energy = MAX;
 		fullness = MAX;
 		fun = MAX;
-		cleanness = MAX;
+		hygiene = MAX;
 		bond = MIN;
 	}
 
@@ -15,26 +17,32 @@ public class CatStats
 	// Minimimu value of each indiviual stat
 	public const float MIN = 0.0F;
 
+	// TODO: use autoproperties to enforce MIN/MAX
 	// How energetic the cat is, when maximized cat has no desire for sleep
-	public float energy;
+	private float energy;
+	public float Energy {get {return energy;} set {energy = Math.Min(MAX, Math.Max(value, MIN));}}
 	// Inverse of hunger, when maximized cat has no desire for food
-	public float fullness;
+	private float fullness;
+	public float Fullness {get {return fullness;} set {fullness = Math.Min(MAX, Math.Max(value, MIN));}}
 	// How much fun cat is having, when maximized cat is having, like, a lot of fun
-	public float fun;
+	private float fun;
+	public float Fun {get {return fun;} set {fun = Math.Min(MAX, Math.Max(value, MIN));}}
 	// How clean the cat and its environment is. When maximized, cat is content with its hygiene
-	public float cleanness;
+	private float hygiene;
+	public float Hygiene {get {return hygiene;} set {hygiene = Math.Min(MAX, Math.Max(value, MIN));}}
 	// How connected cat is with the owner
-	public float bond;
+	private float bond;
+	public float Bond {get {return bond;} set {bond = Math.Min(MAX, Math.Max(value, MIN));}}
 
 	// The total happieness/contentness of the cat. When == MAX, all desires of cat are satisfied
 	public float happieness()
 	{
-		return (energy + fullness + fun + cleanness) / (4.0F * MAX);
+		return (energy + fullness + fun + hygiene) / (4.0F * MAX);
 	}
 	
 	public override string ToString()
 	{
-		return string.Format("CatStats(Energy={0} Fullness={1} Fun={2} Cleanness={3} Bond={4} Happieness={5})",
-							 energy, fullness, fun, cleanness, bond, happieness());
+		return string.Format("CatStats(Energy={0} Fullness={1} Fun={2} Hygiene={3} Bond={4} Happieness={5})",
+							 energy, fullness, fun, hygiene, bond, happieness());
 	}
 }

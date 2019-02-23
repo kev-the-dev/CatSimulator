@@ -9,8 +9,10 @@ public class Cat : MonoBehaviour
 	CatStats stats;
 	// The cats permenant personality, initialized randomly
 	CatPersonality personality;
+	// The cat's current activity/behavior/goal
+	CatActivity activity;
 	// Tracks last time Update() was called for dt calculation
-	double last_update_time;
+	float last_update_time;
 
     // Start is called before the first frame update
     void Start()
@@ -19,20 +21,28 @@ public class Cat : MonoBehaviour
 		stats = new CatStats();
 		// Initialize personality to random values
 		personality = CatPersonality.RandomPersonality();
+		// Start off eating for testing purposes
+		activity = CatActivity.Sleeping;
 
 		// Initialize last update time to now
 		last_update_time = Time.time;
+		
+		Debug.Log(personality);
     }
 
     // Update is called once per frame
     void Update()
     {
 		// Calcuate time delta since last update, in seconds, fps-independent calculations
-		double dt = Time.time - last_update_time;
+		float dt = Time.time - last_update_time;
 		last_update_time = Time.time;
 
+		// Update cat stats with current state
+		personality.UpdateStats(ref stats, activity, dt);
+		
+		// TODO: change activity
+
 		// Log current state
-		Debug.Log(personality);
         Debug.Log(stats);
     }
 }

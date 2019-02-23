@@ -1,0 +1,1 @@
+public enum CatActivity {Idle, Eating, Sleeping, BeingBrushed, BeingPet, FollowingLaser, PlayingWithYarn, OnCatnip};
