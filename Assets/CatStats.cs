@@ -1,15 +1,16 @@
 using System;
+using UnityEngine;
 
 // Defines the current stats of the cat, which are displayed as bars in the HUD and influence behavior
 public class CatStats
 {
-	public CatStats()
+	public CatStats(float energy = MAX, float fullnesss = MAX, float fun = MAX, float hygiene = MAX, float bond = MAX)
 	{
-		energy = MAX;
-		fullness = MAX;
-		fun = MAX;
-		hygiene = MAX;
-		bond = MIN;
+		this.energy = energy;
+		this.fullness = fullness;
+		this.fun = fun;
+		this.hygiene = hygiene;
+		this.bond = bond;
 	}
 
 	// Maximum value of each individual stat
@@ -44,5 +45,23 @@ public class CatStats
 	{
 		return string.Format("CatStats(Energy={0} Fullness={1} Fun={2} Hygiene={3} Bond={4} Happieness={5})",
 							 energy, fullness, fun, hygiene, bond, happieness());
+	}
+	
+	public void Save()
+	{
+		PlayerPrefs.SetFloat("stats.energy", Energy);
+		PlayerPrefs.SetFloat("stats.fullness", Fullness);
+		PlayerPrefs.SetFloat("stats.fun", Fun);
+		PlayerPrefs.SetFloat("stats.hygiene", Hygiene);
+		PlayerPrefs.SetFloat("stats.bond", Bond);
+	}
+	
+	public static CatStats Load()
+	{
+		return new CatStats(PlayerPrefs.GetFloat("stats.energy"),
+		                    PlayerPrefs.GetFloat("stats.fullness"),
+							PlayerPrefs.GetFloat("stats.fun"),
+							PlayerPrefs.GetFloat("stats.hygiene"),
+							PlayerPrefs.GetFloat("stats.bond"));
 	}
 }

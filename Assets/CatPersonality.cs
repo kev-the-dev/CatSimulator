@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float sociability)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;
 		this.playfullness = playfullness;
+		this.cleanlieness = cleanlieness;
 		this.sociability = sociability;
 		
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
@@ -26,7 +27,7 @@ public class CatPersonality
 	// Generates and returns a random cat personality
 	public static CatPersonality RandomPersonality()
 	{
-		return  new CatPersonality(Random.Range(MIN, MAX), Random.Range(MIN, MAX), Random.Range(MIN, MAX), Random.Range(MIN, MAX));
+		return  new CatPersonality(Random.Range(MIN, MAX), Random.Range(MIN, MAX), Random.Range(MIN, MAX), Random.Range(MIN, MAX), Random.Range(MIN, MAX));
 	}
 
 	// Maximum value a personality trait can have
@@ -114,5 +115,24 @@ public class CatPersonality
 		} else {
 			stats.Hygiene -= dt * hygiene_decrease_per_second;
 		}
+	}
+	
+	
+	public void Save()
+	{
+		PlayerPrefs.SetFloat("personality.hungriness", hungriness);
+		PlayerPrefs.SetFloat("personality.tierdness", tierdness);
+		PlayerPrefs.SetFloat("personality.playfullness", playfullness);
+		PlayerPrefs.SetFloat("personality.cleanlieness", cleanlieness);
+		PlayerPrefs.SetFloat("personality.sociability", sociability);
+	}
+	
+	public static CatPersonality Load()
+	{
+		return new CatPersonality(PlayerPrefs.GetFloat("personality.hungriness"), 
+								  PlayerPrefs.GetFloat("personality.tierdness"),
+								  PlayerPrefs.GetFloat("personality.playfullness"),
+								  PlayerPrefs.GetFloat("personality.cleanlieness"),
+								  PlayerPrefs.GetFloat("personality.sociability"));
 	}
 }

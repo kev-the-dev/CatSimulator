@@ -33,6 +33,13 @@ public class Cat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		// TODO:
+        if(Input.GetKeyDown (KeyCode.S))
+            Save();
+
+        if (Input.GetKeyDown (KeyCode.L))
+            Load();
+
 		// Calcuate time delta since last update, in seconds, fps-independent calculations
 		float dt = Time.time - last_update_time;
 		last_update_time = Time.time;
@@ -45,4 +52,28 @@ public class Cat : MonoBehaviour
 		// Log current state
         Debug.Log(stats);
     }
+	
+	
+	public void Load()
+	{
+		personality = CatPersonality.Load();
+		stats = CatStats.Load();
+		
+		Debug.Log("--- LOADED --");
+		Debug.Log(personality);
+		Debug.Log(stats);
+		Debug.Log("-------------");
+	}
+	
+	
+	public void Save()
+	{
+		personality.Save();
+		stats.Save();
+		PlayerPrefs.Save();
+		Debug.Log("--- SAVED --");
+		Debug.Log(personality);
+		Debug.Log(stats);
+		Debug.Log("-------------");
+	}
 }
