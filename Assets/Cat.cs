@@ -75,9 +75,19 @@ public class Cat : MonoBehaviour
 	// Load the cat from a previous save
 	public void Load()
 	{
+		// Load personality and stats
 		personality = CatPersonality.Load();
 		stats = CatStats.Load();
-		// TODO: load pose, color, other info
+		// Load cat pose
+		Quaternion r = new Quaternion(PlayerPrefs.GetFloat("pose.r.x"),
+			PlayerPrefs.GetFloat("pose.r.y"),
+			PlayerPrefs.GetFloat("pose.r.z"),
+			PlayerPrefs.GetFloat("pose.r.w"));
+		Vector3 p = new Vector3(PlayerPrefs.GetFloat("pose.p.x"),
+			PlayerPrefs.GetFloat("pose.p.y"),
+			PlayerPrefs.GetFloat("pose.p.z"));
+		gameObject.transform.SetPositionAndRotation(p, r);
+		// TODO: color, other info
 		
 		Debug.Log("--- LOADED --");
 		Debug.Log(personality);
@@ -88,8 +98,18 @@ public class Cat : MonoBehaviour
 	// Save the current cat to a file for later resuming play
 	public void Save()
 	{
+		// Save personality and stats
 		personality.Save();
 		stats.Save();
+		// Save pose
+		PlayerPrefs.SetFloat("pose.p.x",gameObject.transform.position.x);
+		PlayerPrefs.SetFloat("pose.p.y",gameObject.transform.position.y);
+		PlayerPrefs.SetFloat("pose.p.z",gameObject.transform.position.z);
+		PlayerPrefs.SetFloat("pose.r.x",gameObject.transform.rotation.x);
+		PlayerPrefs.SetFloat("pose.r.y",gameObject.transform.rotation.y);
+		PlayerPrefs.SetFloat("pose.r.z",gameObject.transform.rotation.z);
+		PlayerPrefs.SetFloat("pose.r.w",gameObject.transform.rotation.w);
+
 		// TODO: save pose, color, other info
 		PlayerPrefs.SetFloat("savetime", Time.time);
 		PlayerPrefs.Save();
