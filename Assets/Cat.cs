@@ -17,10 +17,17 @@ public class Cat : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		// Initialize stats for a completely content cat
-		stats = new CatStats();
-		// Initialize personality to random values
-		personality = CatPersonality.RandomPersonality();
+		// If a previous save exists, load it
+		if (PlayerPrefs.HasKey("savetime")) {
+			Debug.Log("Previous save found, loading");
+			Load();
+		// Otherwise create a new random cat and save it
+		} else {
+			Debug.Log("No previous save found, creating a cat");
+			CreateNew();
+			Save();
+		}
+
 		// Start off eating for testing purposes
 		activity = CatActivity.Sleeping;
 
@@ -29,16 +36,28 @@ public class Cat : MonoBehaviour
 		
 		Debug.Log(personality);
     }
+	
+	// Called when there is no save to generate a new random cat
+	void CreateNew()
+	{		// Initialize stats for a completely content cat
+		stats = new CatStats();
+		// Initialize personality to random values
+		personality = CatPersonality.RandomPersonality();
+	}
 
     // Update is called once per frame
     void Update()
     {
-		// TODO:
+		// TODO: autosave
+		//  Save game when S is pressed
         if(Input.GetKeyDown (KeyCode.S))
             Save();
-
+		// Load game when L is pressed
         if (Input.GetKeyDown (KeyCode.L))
             Load();
+		// If R is pressed, reset
+		if (Input.GetKeyDown (KeyCode.R))
+			CreateNew();
 
 		// Calcuate time delta since last update, in seconds, fps-independent calculations
 		float dt = Time.time - last_update_time;
@@ -52,25 +71,29 @@ public class Cat : MonoBehaviour
 		// Log current state
         Debug.Log(stats);
     }
-	
-	
+
+	// Load the cat from a previous save
 	public void Load()
 	{
 		personality = CatPersonality.Load();
 		stats = CatStats.Load();
+		// TODO: load pose, color, other info
 		
 		Debug.Log("--- LOADED --");
 		Debug.Log(personality);
 		Debug.Log(stats);
 		Debug.Log("-------------");
 	}
-	
-	
+
+	// Save the current cat to a file for later resuming play
 	public void Save()
 	{
 		personality.Save();
 		stats.Save();
+		// TODO: save pose, color, other info
+		PlayerPrefs.SetFloat("savetime", Time.time);
 		PlayerPrefs.Save();
+
 		Debug.Log("--- SAVED --");
 		Debug.Log(personality);
 		Debug.Log(stats);
