@@ -4,7 +4,7 @@ using UnityEngine;
 // Defines the current stats of the cat, which are displayed as bars in the HUD and influence behavior
 public class CatStats
 {
-	public CatStats(float energy = MAX, float fullnesss = MAX, float fun = MAX, float hygiene = MAX, float bond = MAX)
+	public CatStats(float energy = MAX, float fullness = MAX, float fun = MAX, float hygiene = MAX, float bond = MAX)
 	{
 		this.energy = energy;
 		this.fullness = fullness;
