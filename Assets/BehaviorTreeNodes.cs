@@ -25,7 +25,7 @@ public class ActionNode : Node
 // Decorators
 public class LoopNode : Node
 {
-	// ?
+	// I'm guessing this kind of node is supposed to repeatedly run its child until it succeeds
 	
 	private Node child;
 	
@@ -58,6 +58,7 @@ public class WaitNode : Node
 	public WaitNode(float _waitTime)
 	{
 		waitTime = _waitTime;
+		startTime = 0F;
 		child = null;
 	}
 	
@@ -70,7 +71,7 @@ public class WaitNode : Node
 		return NodeStatus.Success;
 	}
 	
-	public void addChild(Node _node) {
+	public void addChild(Node _child) {
 		child = _child;
 	}
 	
@@ -79,7 +80,34 @@ public class WaitNode : Node
 
 public class InverterNode : Node
 {
+	private Node child;
 	
+	public InverterNode()
+	{
+		child = null;
+	}
+	
+	public NodeStatus run(float _time)
+	{
+		NodeStatus result;
+		
+		result = child.run(Time.time);
+		
+		if (result == NodeStatus.Success) {
+			return NodeStatus.Failure;
+		}	
+		if (result == NodeStatus.Failure) {
+			return NodeStatus.Success;
+		}
+		// If result == NodeStatus.Running...
+		return result;
+			
+	}
+	
+	public void addChild(Node _child) 
+	{
+		child = _child;
+	}
 }
 
 // Composites
