@@ -1,40 +1,47 @@
 include Node.cs;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 
 // Primitives
-
 public class ActionNode : Node
 {
 	private delegate NodeStatus ActionFunction(float time);
-	private ActionFunction function;
+	private virtual ActionFunction function; // "virtual" keyword means subclasses of ActionNode can overwrite this member variable and provide it with a different definition (for example, a delegate that requires a different number of function arguments)
 	
 	// When ActionNodes are created, they must be passed the function that they will run (as their action). The function must take the current game time as a parameter, and return a value of type NodeStatus
-	public ActionNode (ActionFunction _function) 
+	private ActionNode (ActionFunction _function) 
 	{
 		function = _function;
 	}
 	
-	public NodeStatus run(float _time)
+	private override NodeStatus run(float _time)
 	{
 		return function(_time);
+	}
+	
+	// ActionNodes will never have children
+	private override List<Node> getChildren()
+	{
+		return null;
 	}
 }
 
 // Decorators
 public class LoopNode : Node
 {
-	// I'm guessing this kind of node is supposed to repeatedly run its child until it succeeds
+	// I'm guessing a loop node is supposed to repeatedly run its child until it succeeds.
+	// LoopNodes will only ever have one child.
 	
-	private Node child;
+	private List<Node> children;
 	
 	public LoopNode()
 	{
-		child = null;
+		children = new List<Node>();
 	}
 	
-	public NodeStatus run(float _time)
+	public override NodeStatus run(float _time)
 	{
 		if (child.run() != NodeStatus.Success) {
 			return NodeStatus.Running;
@@ -43,9 +50,16 @@ public class LoopNode : Node
 		return NodeStatus.Success;
 	}
 	
+	// Remove existing child (if one exists) and add new child
 	public void addChild(Node _child)
 	{
-		child = _child;
+		children.Clear();
+		children.Add(_child);
+	}
+	
+	public override List<Node> getChildren()
+	{
+		return children;
 	}
 }
 
@@ -53,16 +67,16 @@ public class WaitNode : Node
 { 
 	private float waitTime { get; set; }; // The amount of time (in seconds) that the node should wait
 	private float startTime { get; set; }; // The time at which the WaitNode was invoked
-	private Node child;
+	private List<Node> children;
 	
 	public WaitNode(float _waitTime)
 	{
 		waitTime = _waitTime;
 		startTime = 0F;
-		child = null;
+		children = new List<Node>();
 	}
 	
-	public NodeStatus run(float _time)
+	public override NodeStatus run(float _time)
 	{
 		if (Time.time < startTime + waitTime) {
 			return NodeStatus.Running;
@@ -71,8 +85,11 @@ public class WaitNode : Node
 		return NodeStatus.Success;
 	}
 	
-	public void addChild(Node _child) {
-		child = _child;
+	// Remove existing child (if one exists) and add new child
+	public void addChild(Node _child) 
+	{
+		children.Clear();
+		children.Add(_child);
 	}
 	
 	
@@ -80,33 +97,42 @@ public class WaitNode : Node
 
 public class InverterNode : Node
 {
-	private Node child;
+	private List<Node> children;
 	
 	public InverterNode()
 	{
-		child = null;
+		children = new List<Node>();
 	}
 	
-	public NodeStatus run(float _time)
+	public override NodeStatus run(float _time)
 	{
 		NodeStatus result;
 		
-		result = child.run(Time.time);
-		
-		if (result == NodeStatus.Success) {
-			return NodeStatus.Failure;
-		}	
-		if (result == NodeStatus.Failure) {
-			return NodeStatus.Success;
-		}
-		// If result == NodeStatus.Running...
-		return result;
+		// If InverterNode has one (and only one) child...
+		if (children.Count == 1) {
+			result = children[0].run(Time.time);
 			
+			if (result == NodeStatus.Success) {
+				return NodeStatus.Failure;
+			}	
+			if (result == NodeStatus.Failure) {
+				return NodeStatus.Success;
+			}
+			// If result == NodeStatus.Running...
+			return result;			
+		}
+		// Throw error because Inverter Node has no child(ren) / more than one child
+		else {
+			throw new System.InvalidOperationException("Error in InverterNode.run(): InverterNodes must have one and only one child.");
+		}
+		
 	}
 	
+	// Remove existing child (if one exists) and add new child
 	public void addChild(Node _child) 
 	{
-		child = _child;
+		children.Clear();
+		children.Add(_child);
 	}
 }
 
