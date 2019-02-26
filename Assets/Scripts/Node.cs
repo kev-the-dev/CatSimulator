@@ -7,10 +7,10 @@ public enum NodeStatus
 	Running
 }
 
-public abstract class Node
+abstract public class Node
 {
-	// Classes deriving from Node must have a member function "run" which takes a float as a parameter and returns a type NodeStatus
-	private abstract NodeStatus run(float time);
-	private abstract List<Node> getChildren();
+	abstract public List<Node> getChildren ();
+	abstract public NodeStatus run (float time);
+	
 }
 
