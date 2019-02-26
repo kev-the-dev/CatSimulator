@@ -36,7 +36,7 @@ public class LoopNode : Node
 	// I'm guessing a loop node is supposed to repeatedly run its child until it succeeds.
 	// LoopNodes will only ever have one child.
 	
-	PrimitiveNode child;
+	Node child;
 	
 	public LoopNode()
 	{
@@ -52,7 +52,7 @@ public class LoopNode : Node
 		return NodeStatus.Success;
 	}
 	
-	public void addChild(PrimitiveNode _child)
+	public void addChild(Node _child)
 	{
 		child = _child;
 	}
@@ -71,7 +71,7 @@ public class WaitNode : Node
 	float waitTime { get; set; } // The amount of time (in seconds) that the node should wait
 	float startTime; // The time at which the node started waiting
 	bool startTimeSet;
-	PrimitiveNode child; // WaitNodes will only ever have one child.
+	Node child; // WaitNodes will only ever have one child.
 	
 	public WaitNode(float _waitTime)
 	{
@@ -100,7 +100,7 @@ public class WaitNode : Node
 		return NodeStatus.Success;
 	}
 	
-	public void addChild(PrimitiveNode _child) 
+	public void addChild(Node _child) 
 	{
 		child = _child;
 	}
@@ -118,7 +118,7 @@ public class WaitNode : Node
 
 public class InverterNode : Node
 {
-	PrimitiveNode child;
+	Node child;
 	
 	public InverterNode()
 	{
@@ -141,7 +141,7 @@ public class InverterNode : Node
 		
 	}
 	
-	public void addChild(PrimitiveNode _child) 
+	public void addChild(Node _child) 
 	{
 		child = _child;
 	}
@@ -156,12 +156,46 @@ public class InverterNode : Node
 }
 
 // Composites
-/*
+
+// Runs child nodes in sequence, one after the other, until either a.) all of them have run successfully, in which case the SequenceNode returns Success, or b.) one of the child nodes runs and returns Failure, in which case the SequenceNode also returns failure.
 public class SequenceNode : Node
 {
+	List<Node> children;
+	NodeStatus result;
+	
+	public SequenceNode()
+	{
+		children = new List<Node>();
+	}
+	
+	public override NodeStatus run(float time) 
+	{
+		foreach (Node child in children)
+		{
+			result = child.run(Time.time);
+			
+			if (result == NodeStatus.Failure)
+			{
+				return NodeStatus.Failure;
+			}
+		}
+		
+		return NodeStatus.Success;
+	}
+	
+	public override List<Node> getChildren()
+	{
+		return children;
+	}
+	
+	public void addChild(Node _child)
+	{
+		children.Add(_child);
+	}
+	
 	
 }
-
+/*
 public class SelectorNode : Node
 {
 	

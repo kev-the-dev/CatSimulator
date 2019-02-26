@@ -7,10 +7,17 @@ public enum NodeStatus
 	Running
 }
 
-abstract public class Node
+public class Node
 {
-	abstract public List<Node> getChildren ();
-	abstract public NodeStatus run (float time);
+	public virtual List<Node> getChildren ()
+	{
+		return null;
+	}
+	
+	public virtual NodeStatus run (float time)
+	{
+		return NodeStatus.Success;
+	}
 	
 }
 
