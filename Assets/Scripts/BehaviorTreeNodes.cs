@@ -195,12 +195,44 @@ public class SequenceNode : Node
 	
 	
 }
-/*
+
+// Selectors will run each of its children until one of them succeeds, in which case the Selector will return Success. If no children succeed, the Selector will return Failure
 public class SelectorNode : Node
 {
+	List<Node> children;
+	NodeStatus result;
 	
+	public SelectorNode()
+	{
+		children = new List<Node>();
+	}
+	
+	public override NodeStatus run(float _time)
+	{
+		foreach (Node child in children)
+		{
+			result = child.run(Time.time);
+			
+			if (result == NodeStatus.Success)
+			{
+				return NodeStatus.Success;
+			}
+		}
+		
+		return NodeStatus.Failure;
+	}
+	
+	public override List<Node> getChildren()
+	{
+		return children;
+	}
+	
+	public void addChild(Node _child)
+	{
+		children.Add(_child);
+	}
 }
-
+/*
 public class ParallelNode : Node
 {
 	
