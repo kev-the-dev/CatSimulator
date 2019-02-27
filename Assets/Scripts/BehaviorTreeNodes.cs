@@ -2,24 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-
-
 // Primitives:
 // Nodes that perform an action or check a condition
 public class PrimitiveNode : Node
 {
-	public delegate NodeStatus PrimitiveFunction(float time);
-	PrimitiveFunction function;
-	
-	// When ActionNodes are created, they must be passed the function that they will run (as their action). The function must take the current game time as a parameter, and return a value of type NodeStatus
-	public PrimitiveNode (PrimitiveFunction _function) 
+	public PrimitiveNode () 
 	{
-		function = _function;
-	}
-	
-	public override NodeStatus run(float _time)
-	{
-		return function(_time);
+		
 	}
 	
 	// Primitive Nodes will not have children
@@ -41,6 +30,11 @@ public class LoopNode : Node
 	public LoopNode()
 	{
 		child = null;
+	}
+	
+	public LoopNode( Node _child )
+	{
+		child = _child;
 	}
 	
 	public override NodeStatus run(float _time)
@@ -79,6 +73,14 @@ public class WaitNode : Node
 		startTime = 0F;
 		startTimeSet = false;
 		child = null;
+	}
+	
+	public WaitNode(float _waitTime, Node _child)
+	{
+		waitTime = _waitTime;
+		startTime = 0F;
+		startTimeSet = false;
+		child = _child;
 	}
 	
 	// WaitNode will return Success after waiting x number of seconds.
@@ -125,6 +127,11 @@ public class InverterNode : Node
 		child = null;
 	}
 	
+	public InverterNode (Node _child)
+	{
+		child = _child;
+	}
+	
 	public override NodeStatus run(float _time)
 	{
 		NodeStatus result;
@@ -168,6 +175,13 @@ public class SequenceNode : Node
 		children = new List<Node>();
 	}
 	
+	// "params" means that this function accepts a variable number of Node objects as its argument. When using this constructor, pass Nodes in a comma separated list.
+	public SequenceNode ( params Node[] _children )
+	{
+		children = new List<Node>(_children);
+	}
+	
+	
 	public override NodeStatus run(float time) 
 	{
 		foreach (Node child in children)
@@ -178,6 +192,11 @@ public class SequenceNode : Node
 			{
 				return NodeStatus.Failure;
 			}
+			if (result == NodeStatus.Running)
+			{
+				return NodeStatus.Running;
+			}
+			
 		}
 		
 		return NodeStatus.Success;
@@ -200,11 +219,18 @@ public class SequenceNode : Node
 public class SelectorNode : Node
 {
 	List<Node> children;
+	Node currentNode;		// If this SelectorNode is 'Running', this will hold a reference to the current child node that will be executed
 	NodeStatus result;
 	
 	public SelectorNode()
 	{
 		children = new List<Node>();
+	}
+	
+	// "params" means that this function accepts a variable number of Node objects as its argument. When using this constructor, pass Nodes in a comma separated list.
+	public SelectorNode ( params Node[] _children )
+	{
+		children = new List<Node>(_children);
 	}
 	
 	public override NodeStatus run(float _time)
@@ -216,6 +242,10 @@ public class SelectorNode : Node
 			if (result == NodeStatus.Success)
 			{
 				return NodeStatus.Success;
+			}
+			if (result == NodeStatus.Running)
+			{
+				return NodeStatus.Running;
 			}
 		}
 		
@@ -233,6 +263,9 @@ public class SelectorNode : Node
 	}
 }
 /*
+// TODO:
+// Implement this. Requires the use of threading. 
+
 public class ParallelNode : Node
 {
 	
