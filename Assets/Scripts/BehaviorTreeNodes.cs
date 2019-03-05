@@ -6,9 +6,16 @@ using UnityEngine.AI;
 // Nodes that perform an action or check a condition
 public class PrimitiveNode : Node
 {
-	public PrimitiveNode () 
+	Context contextObj;
+	
+	public PrimitiveNode ()
 	{
 		
+	}
+
+	public PrimitiveNode (Context _context)
+	{
+		contextObj = _context;
 	}
 	
 	// Primitive Nodes will not have children
@@ -26,14 +33,17 @@ public class LoopNode : Node
 	// LoopNodes will only ever have one child.
 	
 	Node child;
+	Context contextObj;
 	
-	public LoopNode()
+	public LoopNode( Context _context )
 	{
+		contextObj = _context;
 		child = null;
 	}
 	
-	public LoopNode( Node _child )
+	public LoopNode( Context _context, Node _child )
 	{
+		contextObj = _context;
 		child = _child;
 	}
 	
@@ -66,21 +76,24 @@ public class WaitNode : Node
 	float startTime; // The time at which the node started waiting
 	bool startTimeSet;
 	Node child; // WaitNodes will only ever have one child.
+	Context contextObj;
 	
-	public WaitNode(float _waitTime)
+	public WaitNode(Context _context, float _waitTime)
 	{
 		waitTime = _waitTime;
 		startTime = 0F;
 		startTimeSet = false;
 		child = null;
+		contextObj = _context;
 	}
 	
-	public WaitNode(float _waitTime, Node _child)
+	public WaitNode(Context _context, float _waitTime, Node _child)
 	{
 		waitTime = _waitTime;
 		startTime = 0F;
 		startTimeSet = false;
 		child = _child;
+		contextObj = _context;
 	}
 	
 	// WaitNode will return Success after waiting x number of seconds.
@@ -121,15 +134,18 @@ public class WaitNode : Node
 public class InverterNode : Node
 {
 	Node child;
+	Context contextObj;
 	
-	public InverterNode()
+	public InverterNode( Context _context )
 	{
 		child = null;
+		contextObj = _context;
 	}
 	
-	public InverterNode (Node _child)
+	public InverterNode ( Context _context, Node _child )
 	{
 		child = _child;
+		contextObj = _context;
 	}
 	
 	public override NodeStatus run(float _time)
@@ -168,22 +184,31 @@ public class InverterNode : Node
 public class SequenceNode : Node
 {
 	List<Node> children;
+	Context contextObj;
 	NodeStatus result;
 	
-	public SequenceNode()
+	public SequenceNode( Context _context )
 	{
 		children = new List<Node>();
+		contextObj = _context;
 	}
 	
 	// "params" means that this function accepts a variable number of Node objects as its argument. When using this constructor, pass Nodes in a comma separated list.
-	public SequenceNode ( params Node[] _children )
+	public SequenceNode ( Context _context, params Node[] _children )
 	{
 		children = new List<Node>(_children);
+		contextObj = _context;
 	}
 	
 	
 	public override NodeStatus run(float time) 
 	{
+		// If no children, return Failure
+		if (children.Count == 0) 
+		{
+			return NodeStatus.Failure;
+		}
+		
 		foreach (Node child in children)
 		{
 			result = child.run(Time.time);
@@ -220,21 +245,30 @@ public class SelectorNode : Node
 {
 	List<Node> children;
 	Node currentNode;		// If this SelectorNode is 'Running', this will hold a reference to the current child node that will be executed
+	Context contextObj;
 	NodeStatus result;
 	
-	public SelectorNode()
+	public SelectorNode( Context _context )
 	{
 		children = new List<Node>();
+		contextObj = _context;
 	}
 	
 	// "params" means that this function accepts a variable number of Node objects as its argument. When using this constructor, pass Nodes in a comma separated list.
-	public SelectorNode ( params Node[] _children )
+	public SelectorNode ( Context _context, params Node[] _children )
 	{
 		children = new List<Node>(_children);
+		contextObj = _context;
 	}
 	
 	public override NodeStatus run(float _time)
 	{
+		// If no children, return Failure
+		if (children.Count == 0) 
+		{
+			return NodeStatus.Failure;
+		}
+		
 		foreach (Node child in children)
 		{
 			result = child.run(Time.time);
@@ -250,6 +284,7 @@ public class SelectorNode : Node
 		}
 		
 		return NodeStatus.Failure;
+		
 	}
 	
 	public override List<Node> getChildren()

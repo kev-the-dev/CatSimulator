@@ -6,11 +6,23 @@ using UnityEngine;
 public class CatAI : MonoBehaviour
 {
 	BehaviorTree behaviorTree;
+	GameObject testObject;
+	Context contextObject;
 	
     // Start is called before the first frame update
     void Start()
     {
-        behaviorTree = new BehaviorTree();
+		testObject = GameObject.Find("TestObject");
+		contextObject = new Context(gameObject);
+		
+		
+		// Construct the cat's behavior tree
+        behaviorTree = new BehaviorTree(
+											new SelectorNode( 	contextObject,
+																new GoToObject( contextObject, testObject ) 
+															)
+		
+										);
     }
 
     // Update is called once per frame
@@ -18,6 +30,17 @@ public class CatAI : MonoBehaviour
     {
         behaviorTree.run(Time.time);
     }
+	
 }
 
-
+public class Context
+{
+	public GameObject parentCat {get;}
+	
+	public Context (GameObject _parentCat)
+	{
+		parentCat = _parentCat;
+	}
+	
+	
+}

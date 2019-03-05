@@ -4,14 +4,14 @@ using UnityEngine.AI;
 
 // Generic BehaviorTree for a cat.
 // Node inherits from Monobehaviour so our Node classes can have access to Unity functions.
-public class BehaviorTree : MonoBehaviour
+public class BehaviorTree
 {
 	Node root;
 	NodeStatus status;
 	
-	public BehaviorTree ()
+	public BehaviorTree (Node _root)
 	{
-		root = new SelectorNode();
+		root = _root;
 	}
 	
 	// Currently, each call to run() will traverse the entire tree.

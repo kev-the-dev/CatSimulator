@@ -4,8 +4,13 @@ using UnityEngine.AI;
 
 
 // Node inherits from Monobehaviour so our Node classes can have access to Unity functions.
-public class Node : MonoBehaviour
-{	
+public class Node
+{
+	
+	public Node ()
+	{
+		
+	}
 	
 	public virtual List<Node> getChildren ()
 	{

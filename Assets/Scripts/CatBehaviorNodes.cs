@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class GoToObject : PrimitiveNode
 {
+	private Context contextObj;
 	private GameObject destination {get; set;}
 	private Vector3 destinationPosition;
 	private NavMeshAgent catAgent;
@@ -12,13 +13,18 @@ public class GoToObject : PrimitiveNode
 	
 	private bool setDestinationResult;
 	
-	public GoToObject (GameObject _destination)
+	public GoToObject (Context _context, GameObject _destination)
 	{
+		contextObj = _context;
+		
+		// If condition == false, the debug message is displayed
+		Debug.Assert(_destination != null, "GoToObject.GotoObject(): Passed a null destination to the constructor.");
 		destination = _destination;
+		
 		destinationPosition = destination.GetComponent<Transform>().position;
 		
-		catAgent = GetComponent<NavMeshAgent>();
-		catTransform = GetComponent<Transform>();
+		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
+		catTransform = contextObj.parentCat.GetComponent<Transform>();
 	}
 	
 	public override NodeStatus run (float _time)
@@ -50,15 +56,19 @@ public class GoToObject : PrimitiveNode
 
 public class GoToPoint : PrimitiveNode
 {
+	private Context contextObj;
 	private Vector3 point {get; set;}
-	private NavMeshAgent catAgent; 
+	private NavMeshAgent catAgent;
+	private Transform catTransform;
 	
 	private bool setDestinationResult;
 	
-	public GoToPoint (Vector3 _point)
+	public GoToPoint (Context _context, Vector3 _point )
 	{
+		contextObj = _context;
 		point = _point;
-		catAgent = GetComponent<NavMeshAgent>();
+		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
+		catTransform = _context.parentCat.GetComponent<Transform>();
 	}
 	
 	public override NodeStatus run (float _time)
