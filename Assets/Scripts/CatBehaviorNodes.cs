@@ -94,3 +94,66 @@ public class GoToPoint : PrimitiveNode
 	}
 	
 }
+
+public class CheckEnergyNode : PrimitiveNode
+{
+	Context contextObj;
+	float sleepThreshold;
+	
+	public CheckEnergyNode (Context _context)
+	{
+		contextObj = _context;
+		sleepThreshold = contextObj.personality.sleep_threshold;
+	}
+	
+	public CheckEnergyNode ( Context _context, float _custom_sleep_threshold )
+	{
+		contextObj = _context;
+		sleepThreshold = _custom_sleep_threshold;
+	}
+	
+	public override NodeStatus run ( float _time )
+	{
+		// If already sleeping, proceed to next node
+		if (contextObj.activity.current == CatActivityEnum.Sleeping)
+		{
+			return NodeStatus.Success;
+		}
+		// If not already sleeping, but cat is tired, proceed to next node
+		else if (contextObj.stats.Energy < sleepThreshold)
+		{
+			return NodeStatus.Success;
+		}
+		
+		
+		return NodeStatus.Failure;
+	}
+}
+
+public class SleepNode : PrimitiveNode
+{
+	Context contextObj;
+	
+	public SleepNode (Context _context)
+	{
+		contextObj = _context;
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// If not already sleeping, go to sleep
+		if (contextObj.activity.current != CatActivityEnum.Sleeping)
+		{
+			contextObj.activity.current = CatActivityEnum.Sleeping;
+		}
+		// If not fully rested, continue sleeping
+		if (contextObj.stats.Energy < CatStats.MAX)
+		{
+			return NodeStatus.Running;
+		}
+		
+		// Make cat wake up
+		contextObj.activity.current = CatActivityEnum.Idle;
+		return NodeStatus.Success;
+	}
+}

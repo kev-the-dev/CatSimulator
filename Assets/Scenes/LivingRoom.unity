@@ -346,7 +346,6 @@ GameObject:
   - component: {fileID: 550002533}
   - component: {fileID: 550002537}
   - component: {fileID: 550002539}
-  - component: {fileID: 550002538}
   m_Layer: 0
   m_Name: Cat
   m_TagString: Untagged
@@ -436,18 +435,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b8043cc554c308648ae27b41d73ca0bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &550002538
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 550002532}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb12994194550ed4ab3313a5d61f1962, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!195 &550002539

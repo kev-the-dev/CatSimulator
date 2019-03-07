@@ -14,10 +14,9 @@ public class BehaviorTree
 		root = _root;
 	}
 	
-	// Currently, each call to run() will traverse the entire tree.
-	// This is to avoid having to store complex state information in between calls. In the future, if our BT becomes very large, we may want to start saving the state of our BT in between function calls.
 	public void run (float _startTime)
 	{
+		// TODO: implement stack-based iterative preorder traversal
 		status = root.run(_startTime);
 	}
 	
