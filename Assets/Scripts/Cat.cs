@@ -65,6 +65,9 @@ public class Cat : MonoBehaviour
 
 		// Update cat stats with current state
 		personality.UpdateStats(ref stats, activity, dt);
+
+		// Update UI
+		stats.UpdateUI();
 		
 		// TODO: change activity
 
