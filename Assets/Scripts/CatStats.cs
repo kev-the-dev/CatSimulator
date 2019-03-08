@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 // Defines the current stats of the cat, which are displayed as bars in the HUD and influence behavior
 public class CatStats
@@ -11,6 +12,11 @@ public class CatStats
 		this.fun = fun;
 		this.hygiene = hygiene;
 		this.bond = bond;
+
+		this.energy_slider = GameObject.Find("energy_slider").GetComponent <Slider> ();
+		this.fullness_slider = GameObject.Find("food_slider").GetComponent <Slider> ();
+		this.hygiene_slider = GameObject.Find("hygiene_slider").GetComponent <Slider> ();
+		this.fun_slider = GameObject.Find("fun_slider").GetComponent <Slider> ();
 	}
 
 	// Maximum value of each individual stat
@@ -36,12 +42,27 @@ public class CatStats
 	private float bond;
 	public float Bond {get {return bond;} set {bond = Math.Min(MAX, Math.Max(value, MIN));}}
 
+	// UI sliders
+	private Slider energy_slider;
+	private Slider fullness_slider;
+	private Slider fun_slider;
+	private Slider hygiene_slider;
+
 	// The total happieness/contentness of the cat. When == MAX, all desires of cat are satisfied
 	public float happieness()
 	{
 		return (energy + fullness + fun + hygiene) / (4.0F * MAX);
 	}
-	
+
+	// Update the stat bars with the current stats
+	public void UpdateUI()
+	{
+		this.energy_slider.value = energy;
+		this.fullness_slider.value = fullness;
+		this.fun_slider.value = fun;
+		this.hygiene_slider.value = hygiene;
+	}
+
 	public override string ToString()
 	{
 		return string.Format("CatStats(Energy={0} Fullness={1} Fun={2} Hygiene={3} Bond={4} Happieness={5})",
