@@ -20,18 +20,16 @@ public class Cat : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		/*
 		// If a previous save exists, load it
 		if (PlayerPrefs.HasKey("savetime")) {
 			Debug.Log("Previous save found, loading");
 			Load();
-		*/
 		// Otherwise create a new random cat and save it
-		//} else {
+		} else {
 			Debug.Log("No previous save found, creating a cat");
 			CreateNew();
 			Save();
-		//}
+		}
 
 		// Start off idle
 		activity = new CatActivity( CatActivityEnum.Idle );
