@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// Action Nodes 
 
 public class GoToObject : PrimitiveNode
 {
-	private Context contextObj;
 	private GameObject destination {get; set;}
 	private Vector3 destinationPosition;
 	private NavMeshAgent catAgent;
@@ -13,10 +13,8 @@ public class GoToObject : PrimitiveNode
 	
 	private bool setDestinationResult;
 	
-	public GoToObject (Context _context, GameObject _destination)
+	public GoToObject (Context _context, GameObject _destination) : base (_context)
 	{
-		contextObj = _context;
-		
 		// If condition == false, the debug message is displayed
 		Debug.Assert(_destination != null, "GoToObject.GotoObject(): Passed a null destination to the constructor.");
 		destination = _destination;
@@ -56,16 +54,14 @@ public class GoToObject : PrimitiveNode
 
 public class GoToPoint : PrimitiveNode
 {
-	private Context contextObj;
 	private Vector3 point {get; set;}
 	private NavMeshAgent catAgent;
 	private Transform catTransform;
 	
 	private bool setDestinationResult;
 	
-	public GoToPoint (Context _context, Vector3 _point )
+	public GoToPoint (Context _context, Vector3 _point ) : base (_context)
 	{
-		contextObj = _context;
 		point = _point;
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
 		catTransform = _context.parentCat.GetComponent<Transform>();
@@ -95,20 +91,46 @@ public class GoToPoint : PrimitiveNode
 	
 }
 
+public class SleepNode : PrimitiveNode
+{	
+	public SleepNode (Context _context) : base (_context)
+	{
+		
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// If not already sleeping, go to sleep
+		if (contextObj.activity.current != CatActivityEnum.Sleeping)
+		{
+			contextObj.activity.current = CatActivityEnum.Sleeping;
+		}
+		// If not fully rested, continue sleeping
+		if (contextObj.stats.Energy < CatStats.MAX)
+		{
+			return NodeStatus.Running;
+		}
+		
+		// Make cat wake up
+		contextObj.activity.current = CatActivityEnum.Idle;
+		return NodeStatus.Success;
+	}
+}
+
+
+// Condition checking Nodes
+
 public class CheckEnergyNode : PrimitiveNode
 {
-	Context contextObj;
 	float sleepThreshold;
 	
-	public CheckEnergyNode (Context _context)
+	public CheckEnergyNode (Context _context) : base (_context)
 	{
-		contextObj = _context;
 		sleepThreshold = contextObj.personality.sleep_threshold;
 	}
 	
-	public CheckEnergyNode ( Context _context, float _custom_sleep_threshold )
+	public CheckEnergyNode ( Context _context, float _custom_sleep_threshold ) : base (_context)
 	{
-		contextObj = _context;
 		sleepThreshold = _custom_sleep_threshold;
 	}
 	
@@ -130,30 +152,12 @@ public class CheckEnergyNode : PrimitiveNode
 	}
 }
 
-public class SleepNode : PrimitiveNode
+public class CheckFullnessNode : PrimitiveNode
 {
-	Context contextObj;
+	float fullnessThreshold;
 	
-	public SleepNode (Context _context)
+	public CheckFullnessNode (Context _context) : base (_context)
 	{
-		contextObj = _context;
-	}
-	
-	public override NodeStatus run (float _time)
-	{
-		// If not already sleeping, go to sleep
-		if (contextObj.activity.current != CatActivityEnum.Sleeping)
-		{
-			contextObj.activity.current = CatActivityEnum.Sleeping;
-		}
-		// If not fully rested, continue sleeping
-		if (contextObj.stats.Energy < CatStats.MAX)
-		{
-			return NodeStatus.Running;
-		}
-		
-		// Make cat wake up
-		contextObj.activity.current = CatActivityEnum.Idle;
-		return NodeStatus.Success;
+		fullnessThreshold = contextObj.personality.fullness_threshold;
 	}
 }

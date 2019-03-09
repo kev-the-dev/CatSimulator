@@ -3,43 +3,15 @@ using UnityEngine;
 using UnityEngine.AI;
 
 
-// Use this to pass around Unity GameObject related variables to the behavior tree nodes, which do not have direct access to them without a reference (Nodes do not / cannot inherit from Monobehaviour
-public class Context
-{
-	public GameObject parentCat {get; private set;}
-	public CatPersonality personality {get; private set;}
-	public CatStats stats {get; private set;}
-	public CatActivity activity {get; set;}
-	
-	public Context (GameObject _parentCat, ref CatPersonality _personality, ref CatStats _stats, ref CatActivity _activity)
-	{
-		parentCat = _parentCat;
-		personality = _personality;
-		stats = _stats;
-		activity = _activity;
-		
-		Debug.Log("In Context constructor: ");
-		Debug.Log(personality);
-		Debug.Log(stats);
-		Debug.Log(activity);
-		Debug.Log("Exiting Context constructor.");
-	}
-}
+
 
 // Primitives:
 // Nodes that perform an action or check a condition
 public class PrimitiveNode : Node
 {
-	Context contextObj;
-	
-	public PrimitiveNode ()
+	public PrimitiveNode (Context _context) : base (_context)
 	{
 		
-	}
-
-	public PrimitiveNode (Context _context)
-	{
-		contextObj = _context;
 	}
 	
 	// Primitive Nodes will not have children
@@ -57,17 +29,14 @@ public class LoopNode : Node
 	// LoopNodes will only ever have one child.
 	
 	Node child;
-	Context contextObj;
 	
-	public LoopNode( Context _context )
+	public LoopNode (Context _context) : base (_context)
 	{
-		contextObj = _context;
 		child = null;
 	}
 	
-	public LoopNode( Context _context, Node _child )
+	public LoopNode (Context _context, Node _child) : base (_context)
 	{
-		contextObj = _context;
 		child = _child;
 	}
 	
@@ -100,24 +69,21 @@ public class WaitNode : Node
 	float startTime; // The time at which the node started waiting
 	bool startTimeSet;
 	Node child; // WaitNodes will only ever have one child.
-	Context contextObj;
 	
-	public WaitNode(Context _context, float _waitTime)
+	public WaitNode (Context _context, float _waitTime) : base (_context)
 	{
 		waitTime = _waitTime;
 		startTime = 0F;
 		startTimeSet = false;
 		child = null;
-		contextObj = _context;
 	}
 	
-	public WaitNode(Context _context, float _waitTime, Node _child)
+	public WaitNode(Context _context, float _waitTime, Node _child) : base (_context)
 	{
 		waitTime = _waitTime;
 		startTime = 0F;
 		startTimeSet = false;
 		child = _child;
-		contextObj = _context;
 	}
 	
 	// WaitNode will return Success after waiting x number of seconds.
@@ -158,18 +124,15 @@ public class WaitNode : Node
 public class InverterNode : Node
 {
 	Node child;
-	Context contextObj;
 	
-	public InverterNode( Context _context )
+	public InverterNode( Context _context ) : base (_context)
 	{
 		child = null;
-		contextObj = _context;
 	}
 	
-	public InverterNode ( Context _context, Node _child )
+	public InverterNode ( Context _context, Node _child ) : base (_context)
 	{
 		child = _child;
-		contextObj = _context;
 	}
 	
 	public override NodeStatus run(float _time)
@@ -208,20 +171,17 @@ public class InverterNode : Node
 public class SequenceNode : Node
 {
 	List<Node> children;
-	Context contextObj;
 	NodeStatus result;
 	
-	public SequenceNode( Context _context )
+	public SequenceNode( Context _context ) : base (_context)
 	{
 		children = new List<Node>();
-		contextObj = _context;
 	}
 	
 	// "params" means that this function accepts a variable number of Node objects as its argument. When using this constructor, pass Nodes in a comma separated list.
-	public SequenceNode ( Context _context, params Node[] _children )
+	public SequenceNode ( Context _context, params Node[] _children ) : base (_context)
 	{
 		children = new List<Node>(_children);
-		contextObj = _context;
 	}
 	
 	
@@ -268,20 +228,17 @@ public class SequenceNode : Node
 public class SelectorNode : Node
 {
 	List<Node> children;
-	Context contextObj;
 	NodeStatus result;
 	
-	public SelectorNode( Context _context )
+	public SelectorNode( Context _context ) : base (_context)
 	{
 		children = new List<Node>();
-		contextObj = _context;
 	}
 	
 	// "params" means that this function accepts a variable number of Node objects as its argument. When using this constructor, pass Nodes in a comma separated list.
-	public SelectorNode ( Context _context, params Node[] _children )
+	public SelectorNode ( Context _context, params Node[] _children ) : base (_context)
 	{
 		children = new List<Node>(_children);
-		contextObj = _context;
 	}
 	
 	public override NodeStatus run(float _time)
