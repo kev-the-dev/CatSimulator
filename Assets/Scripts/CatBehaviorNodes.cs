@@ -136,17 +136,16 @@ public class CheckEnergyNode : PrimitiveNode
 	
 	public override NodeStatus run ( float _time )
 	{
-		// If already sleeping, proceed to next node
+		// If already sleeping, return success
 		if (contextObj.activity.current == CatActivityEnum.Sleeping)
 		{
 			return NodeStatus.Success;
 		}
-		// If not already sleeping, but cat is tired, proceed to next node
+		// If not already sleeping, but cat is tired, return success
 		else if (contextObj.stats.Energy < sleepThreshold)
 		{
 			return NodeStatus.Success;
 		}
-		
 		
 		return NodeStatus.Failure;
 	}
@@ -154,10 +153,31 @@ public class CheckEnergyNode : PrimitiveNode
 
 public class CheckFullnessNode : PrimitiveNode
 {
-	float fullnessThreshold;
+	float hungerThreshold;
 	
 	public CheckFullnessNode (Context _context) : base (_context)
 	{
-		fullnessThreshold = contextObj.personality.fullness_threshold;
+		hungerThreshold = contextObj.personality.hunger_threshold;
+	}
+	
+	public CheckFullnessNode (Context _context, float _custom_fullness_threshold) : base (_context)
+	{
+		hungerThreshold = _custom_fullness_threshold;
+	}
+	
+	public override NodeStatus run ( float _time )
+	{
+		// if already eating, return success
+		if (contextObj.activity.current == CatActivityEnum.Eating)
+		{
+			return NodeStatus.Success;
+		}
+		// if not already eating, but cat is hungry, return success
+		else if (contextObj.stats.Fullness < hungerThreshold)
+		{
+			return NodeStatus.Success;
+		}
+		
+		return NodeStatus.Failure;
 	}
 }

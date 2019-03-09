@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float fullness_threshold = 0.25F)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;
@@ -10,7 +10,7 @@ public class CatPersonality
 		this.cleanlieness = cleanlieness;
 		this.sociability = sociability;
 		this.sleep_threshold = sleep_threshold;
-		this.fullness_threshold = fullness_threshold;
+		this.hunger_threshold = hunger_threshold;
 		
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
@@ -65,8 +65,8 @@ public class CatPersonality
 	private float hygiene_increase_when_being_brushed_per_second;
 	
 	// Threshold values
-	public float sleep_threshold {get; private set;}
-	public float fullness_threshold {get; private set;}
+	public float sleep_threshold {get; private set;}		// Cat falls asleep when energy reaches this level
+	public float hunger_threshold {get; private set;}		// Cat tries to eat when fullness reaches this level
 	
 	public override string ToString()
 	{
