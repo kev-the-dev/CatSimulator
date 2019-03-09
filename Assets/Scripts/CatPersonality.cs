@@ -2,13 +2,15 @@ using UnityEngine;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;
 		this.playfullness = playfullness;
 		this.cleanlieness = cleanlieness;
 		this.sociability = sociability;
+		this.sleep_threshold = sleep_threshold;
+		this.hunger_threshold = hunger_threshold;
 		
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
@@ -62,6 +64,10 @@ public class CatPersonality
 	private float hygiene_decrease_per_second;
 	private float hygiene_increase_when_being_brushed_per_second;
 	
+	// Threshold values
+	public float sleep_threshold {get; private set;}		// Cat falls asleep when energy reaches this level
+	public float hunger_threshold {get; private set;}		// Cat tries to eat when fullness reaches this level
+	
 	public override string ToString()
 	{
 		return string.Format("CatPersonality(hungriness={0}, tierdness={1}, playfullness={2}, sociability={3})",
@@ -85,32 +91,32 @@ public class CatPersonality
 		stats.Bond += dt * bond_increase_per_happieness_per_second;
 
 		// Update fullness
-		if (CatActivity.Eating == activity) {
+		if (CatActivityEnum.Eating == activity.current) {
 			stats.Fullness += dt * fullness_increase_when_eating_per_second;
 		} else {
 			stats.Fullness -= dt * fullness_decrease_per_second;
 		}
 
 		// Update energy
-		if (CatActivity.Sleeping == activity) {
+		if (CatActivityEnum.Sleeping == activity.current) {
 			stats.Energy += dt * energy_increase_when_sleeping_per_second;
 		} else {
 			stats.Energy -= dt * energy_decrease_per_second;
 		}
 
 		// Update playfullness
-		if (CatActivity.PlayingWithYarn == activity) {
+		if (CatActivityEnum.PlayingWithYarn == activity.current) {
 			stats.Fun += dt * fun_increase_when_playing_with_yarn_per_second;
-		} else if (CatActivity.FollowingLaser == activity) {
+		} else if (CatActivityEnum.FollowingLaser == activity.current) {
 			stats.Fun += dt * fun_increase_when_following_laser_per_second;
-		} else if (CatActivity.OnCatnip == activity) {
+		} else if (CatActivityEnum.OnCatnip == activity.current) {
 			stats.Fun += dt * fun_increase_when_on_catnip_per_second;
 		} else {
 			stats.Fun -= dt * fun_decrease_per_second;
 		}
 
 		// Update hygiene
-		if (CatActivity.BeingBrushed == activity) {
+		if (CatActivityEnum.BeingBrushed == activity.current) {
 			stats.Hygiene += dt * hygiene_increase_when_being_brushed_per_second;
 		} else {
 			stats.Hygiene -= dt * hygiene_decrease_per_second;

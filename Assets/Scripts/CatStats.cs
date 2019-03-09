@@ -23,6 +23,7 @@ public class CatStats
 	public const float MAX = 1.0F;
 	// Minimimu value of each indiviual stat
 	public const float MIN = 0.0F;
+	
 
 	// TODO: use autoproperties to enforce MIN/MAX
 	// How energetic the cat is, when maximized cat has no desire for sleep

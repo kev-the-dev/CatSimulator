@@ -12,6 +12,9 @@ public class Cat : MonoBehaviour
 	// The cat's current activity/behavior/goal
 	CatActivity activity;
 	// Tracks last time Update() was called for dt calculation
+	BehaviorTree behaviorTree;
+	Context contextObject;
+	
 	float last_update_time;
 
     // Start is called before the first frame update
@@ -28,9 +31,19 @@ public class Cat : MonoBehaviour
 			Save();
 		}
 
-		// Start off eating for testing purposes
-		activity = CatActivity.Sleeping;
-
+		// Start off idle
+		activity = new CatActivity( CatActivityEnum.Idle );
+		
+		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
+		// Construct the cat's behavior tree
+        behaviorTree = new BehaviorTree( new SequenceNode ( contextObject, 
+																		new CheckEnergyNode ( contextObject ),
+																		new SleepNode ( contextObject )
+														)
+										
+										);
+		
+		
 		// Initialize last update time to now
 		last_update_time = Time.time;
 		
@@ -39,7 +52,7 @@ public class Cat : MonoBehaviour
 	
 	// Called when there is no save to generate a new random cat
 	void CreateNew()
-	{		// Initialize stats for a completely content cat
+	{	// Initialize stats for a completely content cat
 		stats = new CatStats();
 		// Initialize personality to random values
 		personality = CatPersonality.RandomPersonality();
@@ -70,8 +83,10 @@ public class Cat : MonoBehaviour
 		stats.UpdateUI();
 		
 		// TODO: change activity
+		behaviorTree.run(Time.time);
 
 		// Log current state
+		Debug.Log(activity);
         Debug.Log(stats);
     }
 
