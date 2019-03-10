@@ -47,11 +47,19 @@ public class Cat : MonoBehaviour
 		
 		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
 		// Construct the cat's behavior tree
-        behaviorTree = new BehaviorTree( new SequenceNode ( contextObject, 
-																		new CheckEnergyNode ( contextObject ),
-																		new SleepNode ( contextObject )
-														)
-										
+        behaviorTree = new BehaviorTree(	new SelectorNode ( 	contextObject,
+		
+																/* Energy Sequence */ 	new SequenceNode (	contextObject, 
+																											new CheckEnergyNode ( contextObject ),
+																											new SleepNode ( contextObject )
+																						),
+																				
+																/* Hunger Sequence */	new SequenceNode ( contextObject,
+																											new CheckFullnessNode	( contextObject ),
+																											new GoToObjectNode		( contextObject, GameObject.Find("Food Bowl") ),
+																											new EatNode				( contextObject )
+																										)
+											)
 										);
 		
 		

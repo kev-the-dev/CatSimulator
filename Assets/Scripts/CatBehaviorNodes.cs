@@ -1,10 +1,12 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
+// =========================
 // Action Nodes 
+// =========================
 
-public class GoToObject : PrimitiveNode
+public class GoToObjectNode : PrimitiveNode
 {
 	private GameObject destination {get; set;}
 	private Vector3 destinationPosition;
@@ -13,15 +15,16 @@ public class GoToObject : PrimitiveNode
 	
 	private bool setDestinationResult;
 	
-	public GoToObject (Context _context, GameObject _destination) : base (_context)
+	public GoToObjectNode (Context _context, GameObject _destination) : base (_context)
 	{
 		// If condition == false, the debug message is displayed
-		Debug.Assert(_destination != null, "GoToObject.GotoObject(): Passed a null destination to the constructor.");
+		Debug.Assert(_destination != null, "GoToObjectNode.GoToObjectNode(): Passed a null destination to the constructor.");
 		destination = _destination;
 		
 		destinationPosition = destination.GetComponent<Transform>().position;
 		
 		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
+		catAgent.stoppingDistance = 0.75F; // magic number.... :-(
 		catTransform = contextObj.parentCat.GetComponent<Transform>();
 	}
 	
@@ -30,7 +33,8 @@ public class GoToObject : PrimitiveNode
 		// Update destination GameObject's position in case the GameObject has moved
 		destinationPosition = destination.GetComponent<Transform>().position;
 		
-		if (catTransform.position == destinationPosition)
+		// If cat is at (or approximately at) destination...
+		if ((catTransform.position - destinationPosition).magnitude <= catAgent.stoppingDistance )
 		{
 			return NodeStatus.Success; 
 		}
@@ -38,10 +42,13 @@ public class GoToObject : PrimitiveNode
 		{
 			// Attempts to set destination. Returns true if the destination was successfully requested. Returns false if the path is still being calculated or if no path exists.
 			setDestinationResult = catAgent.SetDestination(destinationPosition);
+			Debug.Log("GoToObjectNode.run(): Travelling to destination...");
+			Debug.Log("GoToObjectNode.run(): Distance from destination: " + ((catTransform.position - destinationPosition).magnitude).ToString() );
 			
 			// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
 			if ( setDestinationResult == false && !(catAgent.pathPending) )
 			{
+				Debug.Log("GoToObjectNode.run(): Path not found.");
 				return NodeStatus.Failure;
 			}
 			
@@ -52,7 +59,7 @@ public class GoToObject : PrimitiveNode
 	}
 }
 
-public class GoToPoint : PrimitiveNode
+public class GoToPointNode : PrimitiveNode
 {
 	private Vector3 point {get; set;}
 	private NavMeshAgent catAgent;
@@ -60,7 +67,7 @@ public class GoToPoint : PrimitiveNode
 	
 	private bool setDestinationResult;
 	
-	public GoToPoint (Context _context, Vector3 _point ) : base (_context)
+	public GoToPointNode (Context _context, Vector3 _point ) : base (_context)
 	{
 		point = _point;
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
@@ -79,7 +86,7 @@ public class GoToPoint : PrimitiveNode
 			setDestinationResult = catAgent.SetDestination(point);
 			
 			// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
-			if ( setDestinationResult == false && !(catAgent.pathPending) )
+			if ( (setDestinationResult == false) && !(catAgent.pathPending) )
 			{
 				return NodeStatus.Failure;
 			}
@@ -117,8 +124,36 @@ public class SleepNode : PrimitiveNode
 	}
 }
 
+public class EatNode : PrimitiveNode
+{
+	public EatNode (Context _context) : base (_context)
+	{
+		
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// If not already eating, make cat eating
+		if (contextObj.activity.current != CatActivityEnum.Eating)
+		{
+			contextObj.activity.current = CatActivityEnum.Eating;
+		}
+		// If not completely full, keep eating
+		if (contextObj.stats.Fullness < CatStats.MAX)
+		{
+			return NodeStatus.Running;
+		}
+		
+		// Make cat stop eating
+		contextObj.activity.current = CatActivityEnum.Idle;
+		return NodeStatus.Success;	
+	}
+	
+}
 
-// Condition checking Nodes
+// =================================
+// Condition Checking Nodes
+// =================================
 
 public class CheckEnergyNode : PrimitiveNode
 {
@@ -181,3 +216,5 @@ public class CheckFullnessNode : PrimitiveNode
 		return NodeStatus.Failure;
 	}
 }
+
+
