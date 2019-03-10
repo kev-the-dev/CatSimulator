@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraScript : MonoBehaviour
 {
 	
 	Vector3 defaultCameraPosition;
@@ -12,7 +12,7 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		cameraTransform = getComponent<Transform>();
+		cameraTransform = GetComponent<Transform>();
         defaultCameraPosition = cameraTransform.position;
 		defaultCameraRotation = cameraTransform.rotation;
     }

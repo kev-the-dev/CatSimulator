@@ -26,9 +26,10 @@ public class Cat : MonoBehaviour
 	Context contextObject;
 	
 	// Petting / brushing / summoning related variables
+	Vector3 inFrontOfUserPosition;
 	bool is_drag;
 	double drag_start_time;
-	float time_of_last_user_interaction {public get;}
+	public float time_of_last_user_interaction {get; private set;}
 	
 	// UI Buttons
 	private Button hand_button, brush_button, food_button, laser_button, liter_button;
@@ -60,6 +61,7 @@ public class Cat : MonoBehaviour
     {
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
+		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
 		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
@@ -93,17 +95,26 @@ public class Cat : MonoBehaviour
 		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
 		
 		// Construct the cat's autonomous behavior tree
-        autonomousCatBehaviorTree = new BehaviorTree( new SequenceNode ( contextObject, 
-																		new CheckEnergyNode ( contextObject ),
-																		new SleepNode ( contextObject )
-														)
-										
-										);
+        autonomousCatBehaviorTree = new BehaviorTree(	new SelectorNode ( 	contextObject,
+		
+																/* Energy Sequence */ 	new SequenceNode (	contextObject, 
+																											new CheckEnergyNode ( contextObject ),
+																											new SleepNode ( contextObject )
+																						),
+																				
+																/* Hunger Sequence */	new SequenceNode ( contextObject,
+																											new CheckFullnessNode	( contextObject ),
+																											new GoToObjectNode		( contextObject, GameObject.Find("Food Bowl") ),
+																											new EatNode				( contextObject )
+																										)
+																		)
+													);
 		autonomousCatBehaviorTree.paused = false;
 										
-		userInteractionBehaviorTree = new BehaviorTree( new SequenceNode ( 	contextObject,
-																			new GoToPoint ( contextObject, new Vector3(0, -0.5, -5) )
-																			/*Focus on user node for ~10 seconds*/
+		userInteractionBehaviorTree = new BehaviorTree ( new SequenceNode 	( 	contextObject,
+																				new GoToPointNode ( contextObject, inFrontOfUserPosition ),
+																				new FocusOnUserNode ( contextObject, 10F )
+																			)
 														);
 		userInteractionBehaviorTree.paused = true;
 		
@@ -257,14 +268,10 @@ public class Cat : MonoBehaviour
 	
 	void OnMouseDown ()
 	{
-		// If mouse just went down, and the user is currently using the petting tool, start counting drag time
-		if ((!is_drag) && (SelectedTool.HAND == tool)) {
+		// If mouse just went down, and the user is currently petting or brushing the cat, start counting drag time
+		if ((!is_drag) && (SelectedTool.HAND == selected_tool || SelectedTool.BRUSH == selected_tool)) {
 			is_drag = true;
 			drag_start_time = Time.time;
-			
-			// Make cat pause autonomous behavior, and approach user
-			autonomousCatBehaviorTree.paused = true;
-			userInteractionBehaviorTree.paused = false;
 		}
 		
 	}
@@ -274,20 +281,45 @@ public class Cat : MonoBehaviour
 		// When mouse released, act based on accumulated drag
 		is_drag = false;
 		double drag_time = Time.time - drag_start_time;
+		time_of_last_user_interaction = Time.time;
 		
-		Debug.Log("Dragged for " + drag_time);
-		
-		// A short drag is registered as a click, causing cat to approach user
-		if (drag_time < 0.1) {
+		// A short drag is registered as a click, causing cat to begin user interaction behaviors
+		if (drag_time < 0.1) 
+		{
+			Camera.main.transform.LookAt(GetComponent<Transform>()); // main camera will follow cat
+			// Switch behavior trees
+			turnOnUserInteractionCatBehavior();
 			
-			time_of_last_user_interaction = Time.time;
-			// Pause cat AI
-			autonomousCatBehaviorTree.paused = true;
-			// Run user interaction AI
-			userInteractionBehaviorTree.paused = false;
-			
-			Camera.main.transform.LookAt(cat_transform); // Main camera look at cat
 		}
+		// Else if cat is in front of user...
+		else if ( (GetComponent<Transform>().position - inFrontOfUserPosition).magnitude <= agent.stoppingDistance )
+		{
+			// If using hand tool, register as petting
+			if (selected_tool == SelectedTool.HAND)
+			{
+				activity.current = CatActivityEnum.BeingPet;
+			}
+			// If using brush tool, register as brushing
+			else if (selected_tool == SelectedTool.BRUSH)
+			{
+				activity.current = CatActivityEnum.BeingBrushed;
+			}
+		}
+		
+		
+	}
+	
+	// Pause one behavior tree and activate the other
+	public void turnOnAutonomousCatBehavior()
+	{
+		autonomousCatBehaviorTree.paused = false;
+		userInteractionBehaviorTree.paused = true;
+	}
+	
+	public void turnOnUserInteractionCatBehavior()
+	{
+		autonomousCatBehaviorTree.paused = true;
+		userInteractionBehaviorTree.paused = false;
 	}
 	
 }
