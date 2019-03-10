@@ -16,12 +16,6 @@ public class CameraScript : MonoBehaviour
         defaultCameraPosition = cameraTransform.position;
 		defaultCameraRotation = cameraTransform.rotation;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 	
 	public void Reset()
 	{

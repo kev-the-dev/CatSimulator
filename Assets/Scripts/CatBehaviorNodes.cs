@@ -70,6 +70,7 @@ public class GoToPointNode : PrimitiveNode
 	{
 		point = _point;
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
+		catAgent.stoppingDistance = 0.75F;
 		catTransform = _context.parentCat.GetComponent<Transform>();
 	}
 	
@@ -159,17 +160,18 @@ public class FocusOnUserNode : PrimitiveNode
 {
 	Cat catScript;
 	float maxFocusTimespan;
-	CameraScript camera;
+	CameraScript cameraScript;
 	
 	public FocusOnUserNode (Context _context, float _maxFocusTimespan) : base (_context)
 	{
 		maxFocusTimespan = _maxFocusTimespan;
 		catScript = contextObj.parentCat.GetComponent<Cat>();
-		camera = Camera.main.GetComponent<CameraScript>();
+		cameraScript = Camera.main.GetComponent<CameraScript>();
 	}
 	
 	public override NodeStatus run (float _time)
 	{
+		Debug.Log("FocusOnUserNode.run(): Focusing on user...");
 		Camera.main.transform.LookAt(contextObj.parentCat.GetComponent<Transform>()); // Main camera look at cat
 		
 		// If maxFocusTimespan elapses since the last user interaction...
@@ -179,7 +181,7 @@ public class FocusOnUserNode : PrimitiveNode
 			catScript.turnOnAutonomousCatBehavior();
 			
 			contextObj.activity.current = CatActivityEnum.Idle;
-			camera.Reset();
+			cameraScript.Reset();
 			
 			return NodeStatus.Success;
 		}
