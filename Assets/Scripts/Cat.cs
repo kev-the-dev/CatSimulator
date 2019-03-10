@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
 public class Cat : MonoBehaviour
@@ -15,11 +16,21 @@ public class Cat : MonoBehaviour
 	BehaviorTree behaviorTree;
 	Context contextObject;
 	
+	// Variales for waundering functionality
+	// Control's cats movement
+	NavMeshAgent agent;
+	// Last time cat has waundered
+	float last_waunder_time;
+	const float WAUNDER_PERIOD_SECONDS = 5F;
+	
 	float last_update_time;
 
     // Start is called before the first frame update
     void Start()
     {
+		// Initialize agent
+		agent = GetComponent<NavMeshAgent>();
+
 		// If a previous save exists, load it
 		if (PlayerPrefs.HasKey("savetime")) {
 			Debug.Log("Previous save found, loading");
@@ -84,11 +95,26 @@ public class Cat : MonoBehaviour
 		
 		// TODO: change activity
 		behaviorTree.run(Time.time);
+		
+		// Carry out behavior based on current behavior
+		if (CatActivityEnum.Idle == activity.current) {
+			if (Time.time - last_waunder_time > WAUNDER_PERIOD_SECONDS) {
+				agent.destination = RandomWaypoint();
+				last_waunder_time = Time.time;
+			}
+		}
 
 		// Log current state
 		Debug.Log(activity);
         Debug.Log(stats);
     }
+	
+	Vector3 RandomWaypoint()
+	{
+		return new Vector3(Random.Range(-20F, 20F),
+		                   Random.Range(-20F, 20F),
+						   0);
+	}
 
 	// Load the cat from a previous save
 	public void Load()
