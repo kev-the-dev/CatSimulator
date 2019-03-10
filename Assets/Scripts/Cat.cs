@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
 
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
 public class Cat : MonoBehaviour
@@ -21,11 +23,47 @@ public class Cat : MonoBehaviour
 	BehaviorTree behaviorTree;
 	Context contextObject;
 	
+	// UI Buttons
+	private Button hand_button, brush_button, food_button, laser_button, liter_button;
+	enum SelectedTool
+	{
+		NONE,
+		HAND,
+		FOOD,
+		BRUSH,
+		LASER_POINTER
+	}
+	SelectedTool selected_tool;
+	public Texture2D hand_cursor;
+	public Texture2D brush_cursor;
+	public Texture2D food_cursor;
+	public Texture2D laser_cursor;
+	
+	// Variales for waundering functionality
+	// Control's cats movement
+	NavMeshAgent agent;
+	// Last time cat has waundered
+	float last_waunder_time;
+	const float WAUNDER_PERIOD_SECONDS = 5F;
+	
 	float last_update_time;
 
     // Start is called before the first frame update
     void Start()
     {
+		// Initialize agent
+		agent = GetComponent<NavMeshAgent>();
+		// Initialize Buttons
+		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
+		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
+		food_button = GameObject.Find("food_button").GetComponent<Button>();
+		laser_button = GameObject.Find("laser_button").GetComponent<Button>();
+		hand_button.onClick.AddListener(delegate {SelectTool(SelectedTool.HAND);});
+		brush_button.onClick.AddListener(delegate {SelectTool(SelectedTool.BRUSH);});
+		food_button.onClick.AddListener(delegate {SelectTool(SelectedTool.FOOD);});
+		laser_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LASER_POINTER);});
+		SelectTool(SelectedTool.HAND);
+
 		// If no previous save exists, create a new random cat
 		if (!PlayerPrefs.HasKey("script_version")) {
 			Debug.Log("No previous save found, creating a cat");
@@ -95,11 +133,26 @@ public class Cat : MonoBehaviour
 
 		// TODO: change activity
 		behaviorTree.run(Time.time);
+		
+		// Carry out behavior based on current behavior
+		if (CatActivityEnum.Idle == activity.current) {
+			if (Time.time - last_waunder_time > WAUNDER_PERIOD_SECONDS) {
+				agent.destination = RandomWaypoint();
+				last_waunder_time = Time.time;
+			}
+		}
 
 		// Log current state
 		Debug.Log(activity);
         Debug.Log(stats);
     }
+	
+	Vector3 RandomWaypoint()
+	{
+		return new Vector3(Random.Range(-20F, 20F),
+		                   Random.Range(-20F, 20F),
+						   0);
+	}
 
 	// Load the cat from a previous save
 	public void Load()
@@ -153,5 +206,30 @@ public class Cat : MonoBehaviour
 		Debug.Log(stats);
 		Debug.Log(style);
 		Debug.Log("-------------");
+	}
+
+	// Change the currently selected tool
+	void SelectTool(SelectedTool tool)
+	{
+		// If no change, nothing to do
+		if (tool == selected_tool) return;
+
+		// Log the change in tool
+		Debug.Log(string.Format("Selected Tool {0}", tool));
+		
+		// TODO: set cursor, other behavior for each tool
+		Vector2 offset = new Vector2(0, 32);
+		if (SelectedTool.HAND == tool)
+		{
+			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
+		} else if (SelectedTool.BRUSH == tool) {
+			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
+		} else if (SelectedTool.FOOD == tool) {
+			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
+		} else if (SelectedTool.LASER_POINTER == tool) {
+			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
+		}
+
+		selected_tool = tool;
 	}
 }
