@@ -117,6 +117,36 @@ public class SleepNode : PrimitiveNode
 	}
 }
 
+public class FocusOnUserNode : PrimitiveNode
+{
+	Cat catScript;
+	float maxFocusTimespan;
+	float timeOfLastUserInteraction;
+	bool timerInitiated;
+	
+	public FocusOnUserNode (Context _context, float _maxFocusTimespan) : base (_context)
+	{
+		maxFocusTimespan = _maxFocusTimespan;
+		timerInitiated = false;
+		
+		catScript = contextObj.parentCat.getComponent<Cat>();
+	}
+	
+	public override NodeStatus run ()
+	{
+		if (!timerInitiated)
+		{
+			timeOfLastUserInteraction = catScript.time_of_last_user_interaction;
+			timerInitiated = true;
+		}
+		
+		if ((Time.time - timeOfLastUserInteraction) > maxFocusTimespan)
+		{
+			
+		}
+	}
+}
+
 
 // Condition checking Nodes
 

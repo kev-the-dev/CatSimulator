@@ -20,8 +20,15 @@ public class Cat : MonoBehaviour
 	// The cat's style (color, fur)
 	CatStyle style;
 	// Tracks last time Update() was called for dt calculation
-	BehaviorTree behaviorTree;
+	
+	BehaviorTree autonomousCatBehaviorTree;
+	BehaviorTree userInteractionBehaviorTree;
 	Context contextObject;
+	
+	// Petting / brushing / summoning related variables
+	bool is_drag;
+	double drag_start_time;
+	float time_of_last_user_interaction {public get;}
 	
 	// UI Buttons
 	private Button hand_button, brush_button, food_button, laser_button, liter_button;
@@ -84,13 +91,21 @@ public class Cat : MonoBehaviour
 		activity = new CatActivity( CatActivityEnum.Idle );
 		
 		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
-		// Construct the cat's behavior tree
-        behaviorTree = new BehaviorTree( new SequenceNode ( contextObject, 
+		
+		// Construct the cat's autonomous behavior tree
+        autonomousCatBehaviorTree = new BehaviorTree( new SequenceNode ( contextObject, 
 																		new CheckEnergyNode ( contextObject ),
 																		new SleepNode ( contextObject )
 														)
 										
 										);
+		autonomousCatBehaviorTree.paused = false;
+										
+		userInteractionBehaviorTree = new BehaviorTree( new SequenceNode ( 	contextObject,
+																			new GoToPoint ( contextObject, new Vector3(0, -0.5, -5) )
+																			/*Focus on user node for ~10 seconds*/
+														);
+		userInteractionBehaviorTree.paused = true;
 		
 		
 		// Initialize last update time to now
@@ -132,7 +147,8 @@ public class Cat : MonoBehaviour
 		stats.UpdateUI();
 
 		// TODO: change activity
-		behaviorTree.run(Time.time);
+		autonomousCatBehaviorTree.run(Time.time);
+		userInteractionBehaviorTree.run(Time.time);
 		
 		// Carry out behavior based on current behavior
 		if (CatActivityEnum.Idle == activity.current) {
@@ -222,14 +238,56 @@ public class Cat : MonoBehaviour
 		if (SelectedTool.HAND == tool)
 		{
 			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
-		} else if (SelectedTool.BRUSH == tool) {
+		} 
+		else if (SelectedTool.BRUSH == tool) 
+		{
 			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
-		} else if (SelectedTool.FOOD == tool) {
+		} 
+		else if (SelectedTool.FOOD == tool) 
+		{
 			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
-		} else if (SelectedTool.LASER_POINTER == tool) {
+		} 
+		else if (SelectedTool.LASER_POINTER == tool) 
+		{
 			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
 		}
 
 		selected_tool = tool;
 	}
+	
+	void OnMouseDown ()
+	{
+		// If mouse just went down, and the user is currently using the petting tool, start counting drag time
+		if ((!is_drag) && (SelectedTool.HAND == tool)) {
+			is_drag = true;
+			drag_start_time = Time.time;
+			
+			// Make cat pause autonomous behavior, and approach user
+			autonomousCatBehaviorTree.paused = true;
+			userInteractionBehaviorTree.paused = false;
+		}
+		
+	}
+	
+	void OnMouseUp ()
+	{
+		// When mouse released, act based on accumulated drag
+		is_drag = false;
+		double drag_time = Time.time - drag_start_time;
+		
+		Debug.Log("Dragged for " + drag_time);
+		
+		// A short drag is registered as a click, causing cat to approach user
+		if (drag_time < 0.1) {
+			
+			time_of_last_user_interaction = Time.time;
+			// Pause cat AI
+			autonomousCatBehaviorTree.paused = true;
+			// Run user interaction AI
+			userInteractionBehaviorTree.paused = false;
+			
+			Camera.main.transform.LookAt(cat_transform); // Main camera look at cat
+		}
+	}
+	
 }
