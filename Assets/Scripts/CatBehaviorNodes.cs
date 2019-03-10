@@ -142,7 +142,8 @@ public class FocusOnUserNode : PrimitiveNode
 		
 		if ((Time.time - timeOfLastUserInteraction) > maxFocusTimespan)
 		{
-			
+			// Wander off
+			catScript.autonomous
 		}
 	}
 }
