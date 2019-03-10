@@ -34,6 +34,10 @@ public class Cat : MonoBehaviour
 		LASER_POINTER
 	}
 	SelectedTool selected_tool;
+	public Texture2D hand_cursor;
+	public Texture2D brush_cursor;
+	public Texture2D food_cursor;
+	public Texture2D laser_cursor;
 	
 	// Variales for waundering functionality
 	// Control's cats movement
@@ -214,13 +218,17 @@ public class Cat : MonoBehaviour
 		Debug.Log(string.Format("Selected Tool {0}", tool));
 		
 		// TODO: set cursor, other behavior for each tool
+		Vector2 offset = new Vector2(0, 32);
 		if (SelectedTool.HAND == tool)
 		{
+			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
 		} else if (SelectedTool.BRUSH == tool) {
+			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
 		} else if (SelectedTool.FOOD == tool) {
+			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
 		} else if (SelectedTool.LASER_POINTER == tool) {
+			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
 		}
-
 
 		selected_tool = tool;
 	}
