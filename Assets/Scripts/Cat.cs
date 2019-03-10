@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
 public class Cat : MonoBehaviour
@@ -22,6 +23,18 @@ public class Cat : MonoBehaviour
 	BehaviorTree behaviorTree;
 	Context contextObject;
 	
+	// UI Buttons
+	private Button hand_button, brush_button, food_button, laser_button, liter_button;
+	enum SelectedTool
+	{
+		NONE,
+		HAND,
+		FOOD,
+		BRUSH,
+		LASER_POINTER
+	}
+	SelectedTool selected_tool;
+	
 	// Variales for waundering functionality
 	// Control's cats movement
 	NavMeshAgent agent;
@@ -36,6 +49,16 @@ public class Cat : MonoBehaviour
     {
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
+		// Initialize Buttons
+		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
+		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
+		food_button = GameObject.Find("food_button").GetComponent<Button>();
+		laser_button = GameObject.Find("laser_button").GetComponent<Button>();
+		hand_button.onClick.AddListener(delegate {SelectTool(SelectedTool.HAND);});
+		brush_button.onClick.AddListener(delegate {SelectTool(SelectedTool.BRUSH);});
+		food_button.onClick.AddListener(delegate {SelectTool(SelectedTool.FOOD);});
+		laser_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LASER_POINTER);});
+		SelectTool(SelectedTool.HAND);
 
 		// If no previous save exists, create a new random cat
 		if (!PlayerPrefs.HasKey("script_version")) {
@@ -179,5 +202,26 @@ public class Cat : MonoBehaviour
 		Debug.Log(stats);
 		Debug.Log(style);
 		Debug.Log("-------------");
+	}
+
+	// Change the currently selected tool
+	void SelectTool(SelectedTool tool)
+	{
+		// If no change, nothing to do
+		if (tool == selected_tool) return;
+
+		// Log the change in tool
+		Debug.Log(string.Format("Selected Tool {0}", tool));
+		
+		// TODO: set cursor, other behavior for each tool
+		if (SelectedTool.HAND == tool)
+		{
+		} else if (SelectedTool.BRUSH == tool) {
+		} else if (SelectedTool.FOOD == tool) {
+		} else if (SelectedTool.LASER_POINTER == tool) {
+		}
+
+
+		selected_tool = tool;
 	}
 }
