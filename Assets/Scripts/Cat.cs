@@ -100,6 +100,7 @@ public class Cat : MonoBehaviour
 		// Start off idle
 		activity = new CatActivity( CatActivityEnum.Idle );
 		
+		
 		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
 		
 		// Construct the cat's behavior tree
@@ -114,6 +115,10 @@ public class Cat : MonoBehaviour
 																															new CheckObjectStatusNode ( contextObject, GameObject.Find("food_in_bowl") ),
 																															new GoToObjectNode ( contextObject, GameObject.Find("Food Bowl") ),
 																															new EatNode ( contextObject, GameObject.Find("food_in_bowl") )
+																														),
+																				/* Wandering Sequence */new SequenceNode (	contextObject,
+																															new WaitNode ( contextObject, 5F),
+																															new GoToRandomPointNode ( contextObject )
 																														)
 																			)
 													);
@@ -121,7 +126,7 @@ public class Cat : MonoBehaviour
 										
 		userInteractionBehaviorTree = new BehaviorTree ( new SequenceNode 	( 	contextObject,
 																				new GoToPointNode ( contextObject, inFrontOfUserPosition ),
-																				new FocusOnUserNode ( contextObject, 10F )
+																				new FocusOnUserNode ( contextObject, 7F )
 																			)
 														);
 		userInteractionBehaviorTree.paused = true;
