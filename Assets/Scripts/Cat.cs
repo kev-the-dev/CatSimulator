@@ -4,6 +4,15 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+public enum SelectedTool
+{
+	NONE,
+	HAND,
+	FOOD,
+	BRUSH,
+	LASER_POINTER
+}
+
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
 public class Cat : MonoBehaviour
 {
@@ -25,15 +34,8 @@ public class Cat : MonoBehaviour
 	
 	// UI Buttons
 	private Button hand_button, brush_button, food_button, laser_button, liter_button;
-	enum SelectedTool
-	{
-		NONE,
-		HAND,
-		FOOD,
-		BRUSH,
-		LASER_POINTER
-	}
-	SelectedTool selected_tool;
+
+	public SelectedTool selected_tool {get; private set;}
 	public Texture2D hand_cursor;
 	public Texture2D brush_cursor;
 	public Texture2D food_cursor;
@@ -41,9 +43,6 @@ public class Cat : MonoBehaviour
 
 	// Line for laser
 	private LineRenderer laser_line;
-
-	// Food bowl
-	private Renderer food_in_bowl;
 	
 	// Variales for waundering functionality
 	// Control's cats movement
@@ -61,8 +60,6 @@ public class Cat : MonoBehaviour
 		agent = GetComponent<NavMeshAgent>();
 		// Initialize laser line
 		laser_line = GameObject.Find("laser_line").GetComponent<LineRenderer>();
-		// Initialize food in bowl
-		food_in_bowl = GameObject.Find("food_in_bowl").GetComponent<Renderer>();
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
 		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
@@ -103,9 +100,10 @@ public class Cat : MonoBehaviour
 																						),
 																				
 																/* Hunger Sequence */	new SequenceNode ( contextObject,
-																											new CheckFullnessNode	( contextObject ),
-																											new GoToObjectNode		( contextObject, GameObject.Find("Food Bowl") ),
-																											new EatNode				( contextObject )
+																											new CheckFullnessNode		( contextObject ),
+																											new CheckObjectStatusNode	( contextObject, GameObject.Find("food_in_bowl") ),
+																											new GoToObjectNode			( contextObject, GameObject.Find("Food Bowl") ),
+																											new EatNode					( contextObject, GameObject.Find("food_in_bowl") )
 																										)
 											)
 										);
@@ -162,18 +160,6 @@ public class Cat : MonoBehaviour
 		// If in follow laser mode, follow laser
 		} else if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
 			GoToLaserPointer();
-		}
-
-		// Refil bowl if food selected
-		// TODO: SetFoodInBowl(false) after eating
-		if (SelectedTool.FOOD == selected_tool && Input.GetMouseButtonDown(0)) {
-			// Find intersection of cursor and an object
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if(Physics.Raycast (ray, out hit) && hit.collider.name == "food_in_bowl")
-			{
-				SetFoodInBowl(true);
-			}
 		}
 
 		// Log current state
@@ -292,10 +278,5 @@ public class Cat : MonoBehaviour
 		}
 
 		selected_tool = tool;
-	}
-
-	void SetFoodInBowl(bool food)
-	{
-		food_in_bowl.enabled = food;
 	}
 }

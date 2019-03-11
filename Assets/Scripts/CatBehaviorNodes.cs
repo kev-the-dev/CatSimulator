@@ -24,7 +24,7 @@ public class GoToObjectNode : PrimitiveNode
 		destinationPosition = destination.GetComponent<Transform>().position;
 		
 		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F; // magic number.... :-(
+		catAgent.stoppingDistance = 2F; // magic number.... :-(
 		catTransform = contextObj.parentCat.GetComponent<Transform>();
 	}
 	
@@ -71,6 +71,7 @@ public class GoToPointNode : PrimitiveNode
 	{
 		point = _point;
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
+		catAgent.stoppingDistance = 2F; // magic number.... :-(
 		catTransform = _context.parentCat.GetComponent<Transform>();
 	}
 	
@@ -126,9 +127,11 @@ public class SleepNode : PrimitiveNode
 
 public class EatNode : PrimitiveNode
 {
-	public EatNode (Context _context) : base (_context)
+	GameObject food;
+	
+	public EatNode (Context _context, GameObject _food) : base (_context)
 	{
-		
+		food = _food;
 	}
 	
 	public override NodeStatus run (float _time)
@@ -145,8 +148,9 @@ public class EatNode : PrimitiveNode
 		}
 		
 		// Make cat stop eating
+		food.SetActive(false);
 		contextObj.activity.current = CatActivityEnum.Idle;
-		return NodeStatus.Success;	
+		return NodeStatus.Success;
 	}
 	
 }
@@ -214,6 +218,29 @@ public class CheckFullnessNode : PrimitiveNode
 		}
 		
 		return NodeStatus.Failure;
+	}
+}
+
+public class CheckObjectStatusNode : PrimitiveNode
+{
+	GameObject obj;
+	
+	public CheckObjectStatusNode (Context _context, GameObject _obj) : base (_context)
+	{
+		obj = _obj;
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// If the object is activated, return true
+		if (obj.activeSelf == true)
+		{
+			return NodeStatus.Success;
+		}
+		
+		// Otherwise, return failure
+		return NodeStatus.Success;
+		
 	}
 }
 
