@@ -11,8 +11,9 @@ public class CatPersonality
 		this.sociability = sociability;
 		this.sleep_threshold = sleep_threshold;
 		this.hunger_threshold = hunger_threshold;
-		
+
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
+		this.bond_increase_when_being_pet_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.fullness_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.hungriness);
 		this.fullness_increase_when_eating_per_second = CalculateMultipier(0.05F, 0.1F, this.hungriness, true);
@@ -53,6 +54,7 @@ public class CatPersonality
 	      information affect behavior **/
 	private float bond_increase_per_second;
 	private float bond_increase_per_happieness_per_second;
+	private float bond_increase_when_being_pet_per_second;
 	private float fullness_decrease_per_second;
 	private float fullness_increase_when_eating_per_second;
 	private float energy_decrease_per_second;
@@ -89,6 +91,11 @@ public class CatPersonality
 		stats.Bond += dt * bond_increase_per_second;
 		// TODO: lower bond if cat is extreamly unhappy?
 		stats.Bond += dt * bond_increase_per_happieness_per_second;
+
+		if (CatActivityEnum.BeingPet == activity.current)
+		{
+			stats.Bond += dt * bond_increase_when_being_pet_per_second;
+		}
 
 		// Update fullness
 		if (CatActivityEnum.Eating == activity.current) {
