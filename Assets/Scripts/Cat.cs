@@ -38,6 +38,9 @@ public class Cat : MonoBehaviour
 	public Texture2D brush_cursor;
 	public Texture2D food_cursor;
 	public Texture2D laser_cursor;
+
+	// Line for laser
+	private LineRenderer laser_line;
 	
 	// Variales for waundering functionality
 	// Control's cats movement
@@ -53,6 +56,9 @@ public class Cat : MonoBehaviour
     {
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
+		// Initialize laser line
+		laser_line = GameObject.Find("laser_line").GetComponent<LineRenderer>();
+		laser_line.enabled = false;
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
 		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
@@ -169,12 +175,22 @@ public class Cat : MonoBehaviour
 	// Set cats waypoint to whatever 3D point the cursor points to
 	void GoToLaserPointer()
 	{
-		 RaycastHit hit;
-		 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		 if(Physics.Raycast (ray, out hit))
-		 {
-			 agent.destination = hit.point;
-		 }
+		// Find intersection of cursor and an object
+		RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+		if(Physics.Raycast (ray, out hit))
+		{
+		 // Set waypoint to this point
+		 agent.destination = hit.point;
+		 // Update laser visualization
+		 Vector3[] line_points = {
+			 Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth / 2, 0, Camera.main.nearClipPlane)),
+			 hit.point
+		 };
+		 laser_line.positionCount = line_points.Length;
+		 laser_line.SetPositions(line_points);
+		}
 	}
 
 	// Load the cat from a previous save
@@ -245,14 +261,18 @@ public class Cat : MonoBehaviour
 		if (SelectedTool.HAND == tool)
 		{
 			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
+			laser_line.enabled = false;
 		} else if (SelectedTool.BRUSH == tool) {
 			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
+			laser_line.enabled = false;
 		} else if (SelectedTool.FOOD == tool) {
 			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
+			laser_line.enabled = false;
 		} else if (SelectedTool.LASER_POINTER == tool) {
+			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
+			laser_line.enabled = true;
 			// TODO(Alex): only change activity if not otherwise busy
 			activity.current = CatActivityEnum.FollowingLaser;
-			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
 		}
 
 		selected_tool = tool;
