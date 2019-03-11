@@ -12,6 +12,7 @@ public class GoToObjectNode : PrimitiveNode
 	private Vector3 destinationPosition;
 	private NavMeshAgent catAgent;
 	private Transform catTransform;
+	private const float roomRadius = 6F; // If a sphere were placed in the room, what would its radius be? (This is an approximation by me (Alex) )
 	
 	private bool setDestinationResult;
 	
@@ -20,18 +21,27 @@ public class GoToObjectNode : PrimitiveNode
 		// If condition == false, the debug message is displayed
 		Debug.Assert(_destination != null, "GoToObjectNode.GoToObjectNode(): Passed a null destination to the constructor.");
 		destination = _destination;
-		
-		destinationPosition = destination.GetComponent<Transform>().position;
-		
 		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F; // magic number.... :-(
+		catAgent.stoppingDistance = 0.75F;
 		catTransform = contextObj.parentCat.GetComponent<Transform>();
 	}
 	
 	public override NodeStatus run (float _time)
 	{
 		// Update destination GameObject's position in case the GameObject has moved
-		destinationPosition = destination.GetComponent<Transform>().position;
+		NavMeshHit hit;
+		bool result = NavMesh.SamplePosition(destination.GetComponent<Transform>().position, out hit, roomRadius, 1);
+		
+		if (result) 
+		{
+			destinationPosition = hit.position;
+			Debug.Log("GoToObjectNode.run(): Found a hit. destinationPosition = " + destinationPosition.ToString() );
+		}
+		else 
+		{
+			Debug.Log("GoToObjectNode.run(): No valid position found within NavMesh.");
+			return NodeStatus.Failure;
+		}
 		
 		// If cat is at (or approximately at) destination...
 		if ((catTransform.position - destinationPosition).magnitude <= catAgent.stoppingDistance )
@@ -71,6 +81,7 @@ public class GoToPointNode : PrimitiveNode
 	{
 		point = _point;
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
+		catAgent.stoppingDistance = 0.75F;
 		catTransform = _context.parentCat.GetComponent<Transform>();
 	}
 	
@@ -94,6 +105,87 @@ public class GoToPointNode : PrimitiveNode
 			return NodeStatus.Running;
 			
 		}
+	}
+	
+}
+
+public class GoToRandomPointNode : PrimitiveNode
+{
+	private Vector3 point;
+	private bool pointSet; // Has a random point been found yet?
+	private NavMeshAgent catAgent;
+	private Transform catTransform;
+	
+	private bool setDestinationResult;
+	
+	private const float roomRadius = 6F; // If a sphere were placed in the room, what would its radius be? (This is an approximation by me (Alex) )
+	
+	public GoToRandomPointNode (Context _context) : base (_context)
+	{
+		point = RandomWaypoint();
+		pointSet = true;
+		
+		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
+		catAgent.stoppingDistance = 0.75F;
+		catTransform = _context.parentCat.GetComponent<Transform>();
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		if (pointSet)
+		{	// If cat is at (or approximately at) the destination point, return Success.
+			if ((catTransform.position - point).magnitude <= catAgent.stoppingDistance)
+			{
+				// Reset variables
+				pointSet = false;
+				
+				return NodeStatus.Success; 
+			}		
+		}
+		else {
+			point = RandomWaypoint();
+			pointSet = true;
+			Debug.Log("GoToRandomPointNode.run(): Destination is: " + point.ToString() );
+		}
+		
+		// Attempts to set destination. Returns true if the destination was successfully requested. Returns false if the path is still being calculated or if no path exists.
+		setDestinationResult = catAgent.SetDestination(point);
+		
+		Debug.Log("GoToRandomPointNode.run(): Travelling to destination...");
+		Debug.Log("GoToRandomPointNode.run(): Distance from destination: " + ((catTransform.position - point).magnitude).ToString() );
+		
+		// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
+		if ( (setDestinationResult == false) && !(catAgent.pathPending) )
+		{
+			Debug.Log("GoToObjectNode.run(): Path not found.");
+			return NodeStatus.Failure;
+		}
+		
+		return NodeStatus.Running;
+
+	}
+	
+	Vector3 RandomWaypoint()
+	{
+		// Reference: https://answers.unity.com/questions/475066/how-to-get-a-random-point-on-navmesh.html
+		
+		Vector3 random = UnityEngine.Random.insideUnitSphere * roomRadius;
+		
+		NavMeshHit hit;
+		Vector3 randomPoint;
+		
+		bool result = NavMesh.SamplePosition(random, out hit, roomRadius, 1);
+		
+		if (result) 
+		{
+			randomPoint = hit.position;
+		}
+		else
+		{
+			randomPoint = Vector3.zero;
+		}
+		
+		return randomPoint;
 	}
 	
 }

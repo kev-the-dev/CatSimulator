@@ -65,25 +65,15 @@ public class LoopNode : Node
 
 public class WaitNode : Node
 { 
-	float waitTime { get; set; } // The amount of time (in seconds) that the node should wait
+	public float waitTime {get; private set;} // The amount of time (in seconds) that the node should wait
 	float startTime; // The time at which the node started waiting
 	bool startTimeSet;
-	Node child; // WaitNodes will only ever have one child.
 	
 	public WaitNode (Context _context, float _waitTime) : base (_context)
 	{
 		waitTime = _waitTime;
 		startTime = 0F;
 		startTimeSet = false;
-		child = null;
-	}
-	
-	public WaitNode(Context _context, float _waitTime, Node _child) : base (_context)
-	{
-		waitTime = _waitTime;
-		startTime = 0F;
-		startTimeSet = false;
-		child = _child;
 	}
 	
 	// WaitNode will return Success after waiting x number of seconds.
@@ -95,29 +85,16 @@ public class WaitNode : Node
 			startTimeSet = true;
 		}
 		
-		if (Time.time < startTime + waitTime) 
+		if (startTime + waitTime > Time.time) 
 		{
 			return NodeStatus.Running;
 		}
 		// else...
 		
+		// wait time has elapsed, so reset variables and return Success
 		startTimeSet = false;
 		return NodeStatus.Success;
 	}
-	
-	public void addChild(Node _child) 
-	{
-		child = _child;
-	}
-	
-	public override List<Node> getChildren()
-	{
-		List<Node> childrenList = new List<Node>();
-		childrenList.Add(child);
-		
-		return childrenList;
-	}
-	
 	
 }
 

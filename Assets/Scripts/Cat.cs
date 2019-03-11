@@ -20,6 +20,10 @@ public class Cat : MonoBehaviour
 	// The cat's style (color, fur)
 	CatStyle style;
 	// Tracks last time Update() was called for dt calculation
+	
+	NavMeshAgent agent;
+	
+	// Cat AI
 	BehaviorTree behaviorTree;
 	Context contextObject;
 	
@@ -44,13 +48,6 @@ public class Cat : MonoBehaviour
 
 	// Food bowl
 	private Renderer food_in_bowl;
-	
-	// Variales for waundering functionality
-	// Control's cats movement
-	NavMeshAgent agent;
-	// Last time cat has waundered
-	float last_waunder_time;
-	const float WAUNDER_PERIOD_SECONDS = 5F;
 	
 	float last_update_time;
 
@@ -97,16 +94,20 @@ public class Cat : MonoBehaviour
 		// Construct the cat's behavior tree
         behaviorTree = new BehaviorTree(	new SelectorNode ( 	contextObject,
 		
-																/* Energy Sequence */ 	new SequenceNode (	contextObject, 
-																											new CheckEnergyNode ( contextObject ),
-																											new SleepNode ( contextObject )
-																						),
+																/* Energy Sequence */ 		new SequenceNode (	contextObject, 
+																												new CheckEnergyNode ( contextObject ),
+																												new SleepNode ( contextObject )
+																											),
 																				
-																/* Hunger Sequence */	new SequenceNode ( contextObject,
-																											new CheckFullnessNode	( contextObject ),
-																											new GoToObjectNode		( contextObject, GameObject.Find("Food Bowl") ),
-																											new EatNode				( contextObject )
-																										)
+																/* Hunger Sequence */		new SequenceNode ( 	contextObject,
+																												new CheckFullnessNode ( contextObject ),
+																												new GoToObjectNode ( contextObject, GameObject.Find("Food Bowl") ),
+																												new EatNode ( contextObject )
+																											),
+																/* Wandering Sequence */	new SequenceNode (	contextObject,
+																												new WaitNode ( contextObject, 5F),
+																												new GoToRandomPointNode ( contextObject )
+																											)
 											)
 										);
 		
@@ -149,18 +150,12 @@ public class Cat : MonoBehaviour
 		// Update UI
 		stats.UpdateUI();
 
-		// TODO: change activity
 		behaviorTree.run(Time.time);
 		
 		// Carry out behavior based on current behavior
-		// If ideling, set random waypoints periodicly
-		if (CatActivityEnum.Idle == activity.current) {
-			if (Time.time - last_waunder_time > WAUNDER_PERIOD_SECONDS) {
-				agent.destination = RandomWaypoint();
-				last_waunder_time = Time.time;
-			}
+		
 		// If in follow laser mode, follow laser
-		} else if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
+		if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
 			GoToLaserPointer();
 		}
 
@@ -177,16 +172,9 @@ public class Cat : MonoBehaviour
 		}
 
 		// Log current state
-		Debug.Log(activity);
-        Debug.Log(stats);
+		//Debug.Log(activity);
+        //Debug.Log(stats);
     }
-	
-	Vector3 RandomWaypoint()
-	{
-		return new Vector3(Random.Range(-20F, 20F),
-		                   Random.Range(-20F, 20F),
-						   0);
-	}
 
 	// Set cats waypoint to whatever 3D point the cursor points to
 	void GoToLaserPointer()
