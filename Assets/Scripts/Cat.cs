@@ -46,6 +46,12 @@ public class Cat : MonoBehaviour
 	public Texture2D brush_cursor;
 	public Texture2D food_cursor;
 	public Texture2D laser_cursor;
+
+	// Line for laser
+	private LineRenderer laser_line;
+
+	// Food bowl
+	private Renderer food_in_bowl;
 	
 	// Variales for waundering functionality
 	// Control's cats movement
@@ -62,6 +68,10 @@ public class Cat : MonoBehaviour
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
 		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
+		// Initialize laser line
+		laser_line = GameObject.Find("laser_line").GetComponent<LineRenderer>();
+		// Initialize food in bowl
+		food_in_bowl = GameObject.Find("food_in_bowl").GetComponent<Renderer>();
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
 		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
@@ -162,10 +172,26 @@ public class Cat : MonoBehaviour
 		userInteractionBehaviorTree.run(Time.time);
 		
 		// Carry out behavior based on current behavior
+		// If ideling, set random waypoints periodicly
 		if (CatActivityEnum.Idle == activity.current) {
 			if (Time.time - last_waunder_time > WAUNDER_PERIOD_SECONDS) {
 				agent.destination = RandomWaypoint();
 				last_waunder_time = Time.time;
+			}
+		// If in follow laser mode, follow laser
+		} else if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
+			GoToLaserPointer();
+		}
+
+		// Refil bowl if food selected
+		// TODO: SetFoodInBowl(false) after eating
+		if (SelectedTool.FOOD == selected_tool && Input.GetMouseButtonDown(0)) {
+			// Find intersection of cursor and an object
+			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if(Physics.Raycast (ray, out hit) && hit.collider.name == "food_in_bowl")
+			{
+				SetFoodInBowl(true);
 			}
 		}
 
@@ -179,6 +205,27 @@ public class Cat : MonoBehaviour
 		return new Vector3(Random.Range(-20F, 20F),
 		                   Random.Range(-20F, 20F),
 						   0);
+	}
+
+	// Set cats waypoint to whatever 3D point the cursor points to
+	void GoToLaserPointer()
+	{
+		// Find intersection of cursor and an object
+		RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+		if(Physics.Raycast (ray, out hit))
+		{
+		 // Set waypoint to this point
+		 agent.destination = hit.point;
+		 // Update laser visualization
+		 Vector3[] line_points = {
+			 Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth / 2, 0, Camera.main.nearClipPlane)),
+			 hit.point
+		 };
+		 laser_line.positionCount = line_points.Length;
+		 laser_line.SetPositions(line_points);
+		}
 	}
 
 	// Load the cat from a previous save
@@ -244,23 +291,23 @@ public class Cat : MonoBehaviour
 		// Log the change in tool
 		Debug.Log(string.Format("Selected Tool {0}", tool));
 		
-		// TODO: set cursor, other behavior for each tool
+		// TODO: set cursor, change current activity, other behavior for each tool
 		Vector2 offset = new Vector2(0, 32);
 		if (SelectedTool.HAND == tool)
 		{
 			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
-		} 
-		else if (SelectedTool.BRUSH == tool) 
-		{
+			laser_line.enabled = false;
+		} else if (SelectedTool.BRUSH == tool) {
 			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
-		} 
-		else if (SelectedTool.FOOD == tool) 
-		{
+			laser_line.enabled = false;
+		} else if (SelectedTool.FOOD == tool) {
 			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
-		} 
-		else if (SelectedTool.LASER_POINTER == tool) 
-		{
+			laser_line.enabled = false;
+		} else if (SelectedTool.LASER_POINTER == tool) {
 			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
+			laser_line.enabled = true;
+			// TODO(Alex): only change activity if not otherwise busy
+			activity.current = CatActivityEnum.FollowingLaser;
 		}
 
 		selected_tool = tool;
@@ -321,5 +368,10 @@ public class Cat : MonoBehaviour
 		autonomousCatBehaviorTree.paused = true;
 		userInteractionBehaviorTree.paused = false;
 	}
-	
+
+	void SetFoodInBowl(bool food)
+	{
+		food_in_bowl.enabled = food;
+	}
+  
 }
