@@ -143,11 +143,15 @@ public class Cat : MonoBehaviour
 		behaviorTree.run(Time.time);
 		
 		// Carry out behavior based on current behavior
+		// If ideling, set random waypoints periodicly
 		if (CatActivityEnum.Idle == activity.current) {
 			if (Time.time - last_waunder_time > WAUNDER_PERIOD_SECONDS) {
 				agent.destination = RandomWaypoint();
 				last_waunder_time = Time.time;
 			}
+		// If in follow laser mode, follow laser
+		} else if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
+			GoToLaserPointer();
 		}
 
 		// Log current state
@@ -160,6 +164,17 @@ public class Cat : MonoBehaviour
 		return new Vector3(Random.Range(-20F, 20F),
 		                   Random.Range(-20F, 20F),
 						   0);
+	}
+
+	// Set cats waypoint to whatever 3D point the cursor points to
+	void GoToLaserPointer()
+	{
+		 RaycastHit hit;
+		 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		 if(Physics.Raycast (ray, out hit))
+		 {
+			 agent.destination = hit.point;
+		 }
 	}
 
 	// Load the cat from a previous save
@@ -225,7 +240,7 @@ public class Cat : MonoBehaviour
 		// Log the change in tool
 		Debug.Log(string.Format("Selected Tool {0}", tool));
 		
-		// TODO: set cursor, other behavior for each tool
+		// TODO: set cursor, change current activity, other behavior for each tool
 		Vector2 offset = new Vector2(0, 32);
 		if (SelectedTool.HAND == tool)
 		{
@@ -235,6 +250,8 @@ public class Cat : MonoBehaviour
 		} else if (SelectedTool.FOOD == tool) {
 			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
 		} else if (SelectedTool.LASER_POINTER == tool) {
+			// TODO(Alex): only change activity if not otherwise busy
+			activity.current = CatActivityEnum.FollowingLaser;
 			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
 		}
 
