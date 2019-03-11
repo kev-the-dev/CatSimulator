@@ -22,7 +22,7 @@ public class GoToObjectNode : PrimitiveNode
 		destinationPosition = destination.GetComponent<Transform>().position;
 		
 		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F;
+		catAgent.stoppingDistance = 1F;
 		catTransform = contextObj.parentCat.GetComponent<Transform>();
 	}
 	
@@ -70,7 +70,7 @@ public class GoToPointNode : PrimitiveNode
 	{
 		point = _point;
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F;
+		catAgent.stoppingDistance = 1F;
 		catTransform = _context.parentCat.GetComponent<Transform>();
 	}
 	
