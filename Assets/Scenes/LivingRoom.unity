@@ -4648,6 +4648,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1747923508}
   - component: {fileID: 1747923509}
+  - component: {fileID: 1747923510}
   m_Layer: 0
   m_Name: happy_indicator
   m_TagString: Untagged
@@ -4717,6 +4718,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1747923510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1747923507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c62c310813061e49ac90c5d13e7ceea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1761155276
 GameObject:
   m_ObjectHideFlags: 0
