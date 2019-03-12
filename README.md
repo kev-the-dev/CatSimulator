@@ -2,9 +2,12 @@
 This project is being developed by the following engineers and artists:
 * Alex Hagan
 * Cathy Beaumont
-* Cindy Le (testing new branch)
+* Cindy Le
 * Kevin Allen
 * Olivia Bering
+
+# Usage Info
+Change the tool by clicking the icons in the upper right corner. With the brush or hand, click then click and drag on cat to brush or pet. Press "s" at anytime to save the game.
 
 # External Assets
 We have used the following royalty free assets in the project:
