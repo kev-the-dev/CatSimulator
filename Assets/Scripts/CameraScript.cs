@@ -6,7 +6,7 @@ public class CameraScript : MonoBehaviour
 {
 	
 	Vector3 defaultCameraPosition;
-	Quaternion defaultCameraRotation;
+	Vector3 defaultCameraRotation;
 	Transform cameraTransform;
 	
     // Start is called before the first frame update
@@ -14,13 +14,13 @@ public class CameraScript : MonoBehaviour
     {
 		cameraTransform = GetComponent<Transform>();
         defaultCameraPosition = cameraTransform.position;
-		defaultCameraRotation = cameraTransform.rotation;
+		defaultCameraRotation = cameraTransform.eulerAngles;
     }
 	
 	public void Reset()
 	{
 		cameraTransform.position = defaultCameraPosition;
 		
-		cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, defaultCameraRotation, 0.5F);
+		cameraTransform.eulerAngles = defaultCameraRotation;
 	}
 }

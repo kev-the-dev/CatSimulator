@@ -13,7 +13,7 @@ public class CatPersonality
 		this.hunger_threshold = hunger_threshold;
 		
 		// Debug Values
-		
+		/*
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_when_being_pet_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
@@ -27,9 +27,8 @@ public class CatPersonality
 		this.fun_increase_when_on_catnip_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.hygiene_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.cleanlieness);
 		this.hygiene_increase_when_being_brushed_per_second = CalculateMultipier(0.1F, 0.2F, this.cleanlieness);
+		*/
 		
-		
-		/*
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_when_being_pet_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
@@ -43,7 +42,6 @@ public class CatPersonality
 		this.fun_increase_when_on_catnip_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.hygiene_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.cleanlieness);
 		this.hygiene_increase_when_being_brushed_per_second = CalculateMultipier(0.1F, 0.2F, this.cleanlieness);
-		*/
 	}
 
 	// Generates and returns a random cat personality

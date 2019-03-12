@@ -272,13 +272,11 @@ public class FocusOnUserNode : PrimitiveNode
 	{
 		maxFocusTimespan = _maxFocusTimespan;
 		catScript = contextObj.parentCat.GetComponent<Cat>();
-		cameraScript = Camera.main.GetComponent<CameraScript>();
 	}
 	
 	public override NodeStatus run (float _time)
 	{
 		Debug.Log("FocusOnUserNode.run(): Focusing on user...");
-		Camera.main.transform.LookAt(contextObj.parentCat.GetComponent<Transform>()); // Main camera look at cat
 		
 		// If maxFocusTimespan elapses since the last user interaction...
 		if ((Time.time - catScript.time_of_last_user_interaction) > maxFocusTimespan)
@@ -287,7 +285,6 @@ public class FocusOnUserNode : PrimitiveNode
 			catScript.turnOnAutonomousCatBehavior();
 			
 			contextObj.activity.current = CatActivityEnum.Idle;
-			cameraScript.Reset();
 			
 			return NodeStatus.Success;
 		}

@@ -174,13 +174,18 @@ public class Cat : MonoBehaviour
 		autonomousCatBehaviorTree.run(Time.time);
 		userInteractionBehaviorTree.run(Time.time);
 		
+		if (userInteractionBehaviorTree.paused == false)
+		{
+			Camera.main.transform.LookAt(gameObject.transform); // Main camera look at cat
+		}
+		
 		// If in follow laser mode, follow laser
 		if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
 			GoToLaserPointer();
 		}
 
 		// Log current state
-		//Debug.Log(activity);
+		Debug.Log(activity);
         //Debug.Log(stats);
     }
 
@@ -340,11 +345,15 @@ public class Cat : MonoBehaviour
 	{
 		autonomousCatBehaviorTree.paused = false;
 		userInteractionBehaviorTree.paused = true;
+		
+		Camera.main.GetComponent<CameraScript>().Reset();
 	}
 
  	public void turnOnUserInteractionCatBehavior()
 	{
 		autonomousCatBehaviorTree.paused = true;
 		userInteractionBehaviorTree.paused = false;
+		
+		Camera.main.transform.LookAt(gameObject.transform); // Main camera look at cat
 	}
 }
