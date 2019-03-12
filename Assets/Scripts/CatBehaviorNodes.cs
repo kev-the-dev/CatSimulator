@@ -1,10 +1,8 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-// =========================
 // Action Nodes 
-// =========================
 
 public class GoToObjectNode : PrimitiveNode
 {
@@ -22,7 +20,7 @@ public class GoToObjectNode : PrimitiveNode
 		Debug.Assert(_destination != null, "GoToObjectNode.GoToObjectNode(): Passed a null destination to the constructor.");
 		destination = _destination;
 		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F;
+		catAgent.stoppingDistance = 2F;
 		catTransform = contextObj.parentCat.GetComponent<Transform>();
 	}
 	
@@ -69,32 +67,50 @@ public class GoToObjectNode : PrimitiveNode
 	}
 }
 
+
 public class GoToPointNode : PrimitiveNode
 {
 	private Vector3 point {get; set;}
+	private Vector3 pointOnNavMesh;
 	private NavMeshAgent catAgent;
 	private Transform catTransform;
+	private const float roomRadius = 6F; // If a sphere were placed in the room, what would its radius be? (This is an approximation by me (Alex) )
 	
 	private bool setDestinationResult;
 	
 	public GoToPointNode (Context _context, Vector3 _point ) : base (_context)
 	{
 		point = _point;
+		
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F;
+		catAgent.stoppingDistance = 2F;
 		catTransform = _context.parentCat.GetComponent<Transform>();
+		
+		NavMeshHit hit;
+		bool result = NavMesh.SamplePosition(point, out hit, roomRadius, 1);
+		
+		if (result) 
+		{
+			pointOnNavMesh = hit.position;
+			Debug.Log("GoToPointNode(): Found a hit. destinationPosition = " + pointOnNavMesh.ToString() );
+		}
+		else 
+		{
+			Debug.Log("GoToPointNode(): No valid position found within NavMesh.");
+		}
 	}
 	
 	public override NodeStatus run (float _time)
 	{
-		if (catTransform.position == point)
+		// If cat is at (or approximately at) destination...
+		if ((catTransform.position - pointOnNavMesh).magnitude <= catAgent.stoppingDistance )
 		{
 			return NodeStatus.Success; 
 		}
 		else
 		{
 			// Attempts to set destination. Returns true if the destination was successfully requested. Returns false if the path is still being calculated or if no path exists.
-			setDestinationResult = catAgent.SetDestination(point);
+			setDestinationResult = catAgent.SetDestination(pointOnNavMesh);
 			
 			// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
 			if ( (setDestinationResult == false) && !(catAgent.pathPending) )
@@ -126,7 +142,7 @@ public class GoToRandomPointNode : PrimitiveNode
 		pointSet = true;
 		
 		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
-		catAgent.stoppingDistance = 0.75F;
+		catAgent.stoppingDistance = 2F;
 		catTransform = _context.parentCat.GetComponent<Transform>();
 	}
 	
@@ -218,9 +234,11 @@ public class SleepNode : PrimitiveNode
 
 public class EatNode : PrimitiveNode
 {
-	public EatNode (Context _context) : base (_context)
+	GameObject food;
+	
+	public EatNode (Context _context, GameObject _food) : base (_context)
 	{
-		
+		food = _food;
 	}
 	
 	public override NodeStatus run (float _time)
@@ -237,15 +255,46 @@ public class EatNode : PrimitiveNode
 		}
 		
 		// Make cat stop eating
+		food.SetActive(false);
 		contextObj.activity.current = CatActivityEnum.Idle;
-		return NodeStatus.Success;	
+		return NodeStatus.Success;
 	}
 	
 }
 
-// =================================
-// Condition Checking Nodes
-// =================================
+public class FocusOnUserNode : PrimitiveNode
+{
+	Cat catScript;
+	float maxFocusTimespan;
+	CameraScript cameraScript;
+	
+	public FocusOnUserNode (Context _context, float _maxFocusTimespan) : base (_context)
+	{
+		maxFocusTimespan = _maxFocusTimespan;
+		catScript = contextObj.parentCat.GetComponent<Cat>();
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		Debug.Log("FocusOnUserNode.run(): Focusing on user...");
+		
+		// If maxFocusTimespan elapses since the last user interaction...
+		if ((Time.time - catScript.time_of_last_user_interaction) > maxFocusTimespan)
+		{
+			// Switch to autonomous cat behaviors
+			catScript.turnOnAutonomousCatBehavior();
+			
+			contextObj.activity.current = CatActivityEnum.Idle;
+			
+			return NodeStatus.Success;
+		}
+		
+		return NodeStatus.Running;
+	}
+}
+
+
+// Condition checking Nodes
 
 public class CheckEnergyNode : PrimitiveNode
 {
@@ -309,4 +358,25 @@ public class CheckFullnessNode : PrimitiveNode
 	}
 }
 
-
+public class CheckObjectStatusNode : PrimitiveNode
+{
+	GameObject obj;
+	
+	public CheckObjectStatusNode (Context _context, GameObject _obj) : base (_context)
+	{
+		obj = _obj;
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// If the object is activated, return true
+		if (obj.activeSelf == true)
+		{
+			return NodeStatus.Success;
+		}
+		
+		// Otherwise, return failure
+		return NodeStatus.Failure;
+		
+	}
+}

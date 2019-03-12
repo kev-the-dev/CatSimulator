@@ -4,6 +4,15 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+public enum SelectedTool
+{
+	NONE,
+	HAND,
+	FOOD,
+	BRUSH,
+	LASER_POINTER
+}
+
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
 public class Cat : MonoBehaviour
 {
@@ -19,25 +28,23 @@ public class Cat : MonoBehaviour
 	CatActivity activity;
 	// The cat's style (color, fur)
 	CatStyle style;
-	// Tracks last time Update() was called for dt calculation
 	
 	NavMeshAgent agent;
 	
 	// Cat AI
-	BehaviorTree behaviorTree;
+	BehaviorTree autonomousCatBehaviorTree;
+	BehaviorTree userInteractionBehaviorTree;
 	Context contextObject;
+	
+	// Petting / brushing / summoning related variables
+	Vector3 inFrontOfUserPosition;
+	bool is_drag;
+	double drag_start_time;
+	public float time_of_last_user_interaction {get; private set;}
 	
 	// UI Buttons
 	private Button hand_button, brush_button, food_button, laser_button, liter_button;
-	enum SelectedTool
-	{
-		NONE,
-		HAND,
-		FOOD,
-		BRUSH,
-		LASER_POINTER
-	}
-	SelectedTool selected_tool;
+	public SelectedTool selected_tool {get; private set;}
 	public Texture2D hand_cursor;
 	public Texture2D brush_cursor;
 	public Texture2D food_cursor;
@@ -56,10 +63,13 @@ public class Cat : MonoBehaviour
     {
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
+		
+		// Cat position for petting / brushing
+		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
+		
 		// Initialize laser line
 		laser_line = GameObject.Find("laser_line").GetComponent<LineRenderer>();
-		// Initialize food in bowl
-		food_in_bowl = GameObject.Find("food_in_bowl").GetComponent<Renderer>();
+		
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
 		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
@@ -90,26 +100,36 @@ public class Cat : MonoBehaviour
 		// Start off idle
 		activity = new CatActivity( CatActivityEnum.Idle );
 		
-		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
-		// Construct the cat's behavior tree
-        behaviorTree = new BehaviorTree(	new SelectorNode ( 	contextObject,
 		
-																/* Energy Sequence */ 		new SequenceNode (	contextObject, 
-																												new CheckEnergyNode ( contextObject ),
-																												new SleepNode ( contextObject )
-																											),
-																				
-																/* Hunger Sequence */		new SequenceNode ( 	contextObject,
-																												new CheckFullnessNode ( contextObject ),
-																												new GoToObjectNode ( contextObject, GameObject.Find("Food Bowl") ),
-																												new EatNode ( contextObject )
-																											),
-																/* Wandering Sequence */	new SequenceNode (	contextObject,
-																												new WaitNode ( contextObject, 5F),
-																												new GoToRandomPointNode ( contextObject )
-																											)
-											)
-										);
+		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
+		
+		// Construct the cat's behavior tree
+        autonomousCatBehaviorTree = new BehaviorTree(	new SelectorNode	( 	contextObject,
+		
+																				/* Energy Sequence */ 	new SequenceNode (	contextObject, 
+																															new CheckEnergyNode ( contextObject ),
+																															new SleepNode ( contextObject )
+																														),
+																				/* Hunger Sequence */	new SequenceNode ( 	contextObject,
+																															new CheckFullnessNode ( contextObject ),
+																															new CheckObjectStatusNode ( contextObject, GameObject.Find("food_in_bowl") ),
+																															new GoToObjectNode ( contextObject, GameObject.Find("Food Bowl") ),
+																															new EatNode ( contextObject, GameObject.Find("food_in_bowl") )
+																														),
+																				/* Wandering Sequence */new SequenceNode (	contextObject,
+																															new WaitNode ( contextObject, 5F),
+																															new GoToRandomPointNode ( contextObject )
+																														)
+																			)
+													);
+		autonomousCatBehaviorTree.paused = false;
+										
+		userInteractionBehaviorTree = new BehaviorTree ( new SequenceNode 	( 	contextObject,
+																				new GoToPointNode ( contextObject, inFrontOfUserPosition ),
+																				new FocusOnUserNode ( contextObject, 7F )
+																			)
+														);
+		userInteractionBehaviorTree.paused = true;
 		
 		
 		// Initialize last update time to now
@@ -150,29 +170,22 @@ public class Cat : MonoBehaviour
 		// Update UI
 		stats.UpdateUI();
 
-		behaviorTree.run(Time.time);
+		// Run behavior tree
+		autonomousCatBehaviorTree.run(Time.time);
+		userInteractionBehaviorTree.run(Time.time);
 		
-		// Carry out behavior based on current behavior
+		if (userInteractionBehaviorTree.paused == false)
+		{
+			Camera.main.transform.LookAt(gameObject.transform); // Main camera look at cat
+		}
 		
 		// If in follow laser mode, follow laser
 		if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
 			GoToLaserPointer();
 		}
 
-		// Refil bowl if food selected
-		// TODO: SetFoodInBowl(false) after eating
-		if (SelectedTool.FOOD == selected_tool && Input.GetMouseButtonDown(0)) {
-			// Find intersection of cursor and an object
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if(Physics.Raycast (ray, out hit) && hit.collider.name == "food_in_bowl")
-			{
-				SetFoodInBowl(true);
-			}
-		}
-
 		// Log current state
-		//Debug.Log(activity);
+		Debug.Log(activity);
         //Debug.Log(stats);
     }
 
@@ -281,9 +294,65 @@ public class Cat : MonoBehaviour
 
 		selected_tool = tool;
 	}
-
-	void SetFoodInBowl(bool food)
+	
+	void OnMouseDown ()
 	{
-		food_in_bowl.enabled = food;
+		Debug.Log("Clicked on cat.");
+		
+		// If mouse just went down, and the user is currently petting or brushing the cat, start counting drag time
+		if ((!is_drag) && (SelectedTool.HAND == selected_tool || SelectedTool.BRUSH == selected_tool)) {
+			is_drag = true;
+			drag_start_time = Time.time;
+		}
+
+ 	}
+
+ 	void OnMouseUp ()
+	{
+		// When mouse released, act based on accumulated drag
+		is_drag = false;
+		double drag_time = Time.time - drag_start_time;
+		time_of_last_user_interaction = Time.time;
+
+ 		// A short drag is registered as a click, causing cat to begin user interaction behaviors
+		if (drag_time < 0.1) 
+		{
+			// Switch behavior trees
+			turnOnUserInteractionCatBehavior();
+
+ 		}
+		// Else if cat is in front of user...
+		else if ( (GetComponent<Transform>().position - inFrontOfUserPosition).magnitude <= agent.stoppingDistance )
+		{
+			// If using hand tool, register as petting
+			if (selected_tool == SelectedTool.HAND)
+			{
+				activity.current = CatActivityEnum.BeingPet;
+			}
+			// If using brush tool, register as brushing
+			else if (selected_tool == SelectedTool.BRUSH)
+			{
+				activity.current = CatActivityEnum.BeingBrushed;
+			}
+		}
+
+
+ 	}
+
+ 	// Pause one behavior tree and activate the other
+	public void turnOnAutonomousCatBehavior()
+	{
+		autonomousCatBehaviorTree.paused = false;
+		userInteractionBehaviorTree.paused = true;
+		
+		Camera.main.GetComponent<CameraScript>().Reset();
+	}
+
+ 	public void turnOnUserInteractionCatBehavior()
+	{
+		autonomousCatBehaviorTree.paused = true;
+		userInteractionBehaviorTree.paused = false;
+		
+		Camera.main.transform.LookAt(gameObject.transform); // Main camera look at cat
 	}
 }
