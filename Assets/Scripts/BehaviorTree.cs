@@ -8,6 +8,7 @@ public class BehaviorTree
 {
 	Node root;
 	NodeStatus status;
+	public bool paused; // Pause running the behavior tree (in the case of user interaction, etc., so cat will not wander off)
 	
 	public BehaviorTree (Node _root)
 	{
@@ -16,8 +17,11 @@ public class BehaviorTree
 	
 	public void run (float _startTime)
 	{
-		// TODO: implement stack-based iterative preorder traversal
-		status = root.run(_startTime);
+		if (!paused)
+		{
+			// TODO: implement stack-based iterative preorder traversal
+			status = root.run(_startTime);
+		}
 	}
 	
 }

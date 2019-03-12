@@ -11,7 +11,24 @@ public class CatPersonality
 		this.sociability = sociability;
 		this.sleep_threshold = sleep_threshold;
 		this.hunger_threshold = hunger_threshold;
-
+		
+		// Debug Values
+		/*
+		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
+		this.bond_increase_when_being_pet_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
+		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
+		this.fullness_decrease_per_second = CalculateMultipier(0.1F, 0.11F, this.hungriness);
+		this.fullness_increase_when_eating_per_second = CalculateMultipier(0.05F, 0.1F, this.hungriness, true);
+		this.energy_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.tierdness);
+		this.energy_increase_when_sleeping_per_second = CalculateMultipier(0.1F, 0.2F, this.tierdness, true);
+		this.fun_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.playfullness);
+		this.fun_increase_when_following_laser_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
+		this.fun_increase_when_playing_with_yarn_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
+		this.fun_increase_when_on_catnip_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
+		this.hygiene_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.cleanlieness);
+		this.hygiene_increase_when_being_brushed_per_second = CalculateMultipier(0.1F, 0.2F, this.cleanlieness);
+		*/
+		
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_when_being_pet_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
