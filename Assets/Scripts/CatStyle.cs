@@ -27,10 +27,15 @@ public class CatStyle
 	// Generates and returns a random cat style
 	public static CatStyle RandomStyle()
 	{
-		// TODO: generate non-solid types
-		// TODO: use HSV -> RGB to create a realistic set of colors, not just any random RGB value
+		// TODO: generate more random colors by generating colors within ranges of HSV values
+		Color[] possible_colors = {
+			new Color(73 / 255F, 71 / 255F, 71 / 255F),
+			new Color(104 / 255F, 61 / 255F, 54 / 255F),
+			new Color(145 / 255F, 53 / 255F, 30 / 255F),
+			new Color(183 / 255F, 151 / 255F, 136 / 255F)
+		};
 		CatCoat coat = CatCoat.Solid;
-		Color primary = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+		Color primary = possible_colors[UnityEngine.Random.Range(0, possible_colors.Length)];
 		
 		return new CatStyle(coat, primary, new Color(0F, 0F, 0F));
 	}
