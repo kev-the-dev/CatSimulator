@@ -317,7 +317,6 @@ public class Cat : MonoBehaviour
  		// A short drag is registered as a click, causing cat to begin user interaction behaviors
 		if (drag_time < 0.1) 
 		{
-			Camera.main.transform.LookAt(GetComponent<Transform>()); // main camera will follow cat
 			// Switch behavior trees
 			turnOnUserInteractionCatBehavior();
 
