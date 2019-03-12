@@ -17,13 +17,14 @@ public class CatStats
 		this.fullness_slider = GameObject.Find("food_slider").GetComponent <Slider> ();
 		this.hygiene_slider = GameObject.Find("hygiene_slider").GetComponent <Slider> ();
 		this.fun_slider = GameObject.Find("fun_slider").GetComponent <Slider> ();
+		this.happy_indicator = GameObject.Find("happy_indicator").GetComponent<Renderer>();
 	}
 
 	// Maximum value of each individual stat
 	public const float MAX = 1.0F;
 	// Minimimu value of each indiviual stat
 	public const float MIN = 0.0F;
-	
+	public const float HAPPIENESS_INDICATOR_THRESHOLD = MAX * 0.9F;
 
 	// TODO: use autoproperties to enforce MIN/MAX
 	// How energetic the cat is, when maximized cat has no desire for sleep
@@ -47,6 +48,8 @@ public class CatStats
 	private Slider fullness_slider;
 	private Slider fun_slider;
 	private Slider hygiene_slider;
+	// Happineness indicator
+	private Renderer happy_indicator;
 
 	// The total happieness/contentness of the cat. When == MAX, all desires of cat are satisfied
 	public float happieness()
@@ -61,6 +64,7 @@ public class CatStats
 		this.fullness_slider.value = fullness;
 		this.fun_slider.value = fun;
 		this.hygiene_slider.value = hygiene;
+		this.happy_indicator.enabled = happieness() > HAPPIENESS_INDICATOR_THRESHOLD;
 	}
 
 	public override string ToString()
