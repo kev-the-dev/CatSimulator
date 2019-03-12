@@ -1,7 +1,10 @@
 # Contributors
 This project is being developed by the following engineers and artists:
+* Alex Hagan
+* Cathy Beaumont
+* Cindy Le
 * Kevin Allen
-* Cindy Le (testing new branch)
+* Olivia Bering
 
 # External Assets
 We have used the following royalty free assets in the project:
