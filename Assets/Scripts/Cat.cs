@@ -50,11 +50,8 @@ public class Cat : MonoBehaviour
 	public Texture2D food_cursor;
 	public Texture2D laser_cursor;
 
-	// Line for laser
-	private LineRenderer laser_line;
-
-	// Food bowl
-	private Renderer food_in_bowl;
+	// Laser pointer GameObject's script
+	LaserPointer laserPointer;
 	
 	float last_update_time;
 
@@ -67,8 +64,8 @@ public class Cat : MonoBehaviour
 		// Cat position for petting / brushing
 		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
 		
-		// Initialize laser line
-		laser_line = GameObject.Find("laser_line").GetComponent<LineRenderer>();
+		// Get the laser pointer game object's attached script
+		laserPointer = GameObject.Find("Laser Pointer").GetComponent<LaserPointer>();
 		
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
@@ -174,21 +171,25 @@ public class Cat : MonoBehaviour
 		autonomousCatBehaviorTree.run(Time.time);
 		userInteractionBehaviorTree.run(Time.time);
 		
+		// If cat is currently interacting with user, the camera should follow the cat
 		if (userInteractionBehaviorTree.paused == false)
 		{
 			Camera.main.transform.LookAt(gameObject.transform); // Main camera look at cat
 		}
 		
 		// If in follow laser mode, follow laser
+		/*
 		if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
 			GoToLaserPointer();
 		}
+		*/
 
 		// Log current state
 		Debug.Log(activity);
         //Debug.Log(stats);
     }
 
+	/*
 	// Set cats waypoint to whatever 3D point the cursor points to
 	void GoToLaserPointer()
 	{
@@ -209,6 +210,7 @@ public class Cat : MonoBehaviour
 		 laser_line.SetPositions(line_points);
 		}
 	}
+	*/
 
 	// Load the cat from a previous save
 	public void Load()
@@ -269,27 +271,38 @@ public class Cat : MonoBehaviour
 	{
 		// If no change, nothing to do
 		if (tool == selected_tool) return;
-
+		
+		// If selected tool is not the laser pointer, ensure the laser pointer GameObject is turned off
+		if (tool != SelectedTool.LASER_POINTER)
+		{
+			laserPointer.poweredOn = false;
+		}
+		
 		// Log the change in tool
 		Debug.Log(string.Format("Selected Tool {0}", tool));
 		
 		// TODO: set cursor, change current activity, other behavior for each tool
 		Vector2 offset = new Vector2(0, 32);
+		
 		if (SelectedTool.HAND == tool)
 		{
 			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
-			laser_line.enabled = false;
-		} else if (SelectedTool.BRUSH == tool) {
+		} 
+		else if (SelectedTool.BRUSH == tool) 
+		{
 			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
-			laser_line.enabled = false;
-		} else if (SelectedTool.FOOD == tool) {
+		} 
+		else if (SelectedTool.FOOD == tool) 
+		{
 			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
-			laser_line.enabled = false;
-		} else if (SelectedTool.LASER_POINTER == tool) {
+		} 
+		else if (SelectedTool.LASER_POINTER == tool) 
+		{
 			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
-			laser_line.enabled = true;
+			laserPointer.poweredOn = true;
+			
 			// TODO(Alex): only change activity if not otherwise busy
-			activity.current = CatActivityEnum.FollowingLaser;
+			//activity.current = CatActivityEnum.FollowingLaser;
 		}
 
 		selected_tool = tool;
