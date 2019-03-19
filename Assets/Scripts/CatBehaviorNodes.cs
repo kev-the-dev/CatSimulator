@@ -125,6 +125,72 @@ public class GoToPointNode : PrimitiveNode
 	
 }
 
+public delegate Vector3 getPointDelegate();
+
+// Make cat go to a point that changes location during runtime
+public class GoToDynamicPointNode : PrimitiveNode
+{
+	
+	getPointDelegate getPoint;	// Delegate for a function that returns the point the cat should go to
+	
+	private Vector3 point {get; set;}
+	private Vector3 pointOnNavMesh;
+	private NavMeshAgent catAgent;
+	private Transform catTransform;
+	private const float roomRadius = 6F; // If a sphere were placed in the room, what would its radius be? (This is an approximation by me (Alex) )
+	
+	private bool setDestinationResult;
+	
+	public GoToDynamicPointNode (Context _context, getPointDelegate _del ) : base (_context)
+	{
+		getPoint = _del;
+		
+		catAgent = _context.parentCat.GetComponent<NavMeshAgent>();
+		catAgent.stoppingDistance = 2F;
+		catTransform = _context.parentCat.GetComponent<Transform>();
+		
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// Get the point that the cat is supposed to go to
+		point = getPoint();
+		
+		NavMeshHit hit;
+		bool result = NavMesh.SamplePosition(point, out hit, roomRadius, 1);
+		
+		if (result) 
+		{
+			pointOnNavMesh = hit.position;
+			Debug.Log("GoToDynamicPointNode(): Found a hit. destinationPosition = " + pointOnNavMesh.ToString() );
+		}
+		else 
+		{
+			Debug.Log("GoToDynamicPointNode(): No valid position found within NavMesh.");
+		}
+		
+		// If cat is at (or approximately at) destination...
+		if ((catTransform.position - pointOnNavMesh).magnitude <= catAgent.stoppingDistance )
+		{
+			return NodeStatus.Success; 
+		}
+		else
+		{
+			// Attempts to set destination. Returns true if the destination was successfully requested. Returns false if the path is still being calculated or if no path exists.
+			setDestinationResult = catAgent.SetDestination(pointOnNavMesh);
+			
+			// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
+			if ( (setDestinationResult == false) && !(catAgent.pathPending) )
+			{
+				return NodeStatus.Failure;
+			}
+			
+			return NodeStatus.Running;
+			
+		}
+	}	
+}
+
 public class GoToRandomPointNode : PrimitiveNode
 {
 	private Vector3 point;
@@ -290,6 +356,20 @@ public class FocusOnUserNode : PrimitiveNode
 		}
 		
 		return NodeStatus.Running;
+	}
+}
+
+public class ChaseLaserNode : PrimitiveNode
+{
+	public ChaseLaserNode (Context _context) : base (_context)
+	{
+		
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		contextObj.activity.current = CatActivityEnum.FollowingLaser;
+		return NodeStatus.Success;
 	}
 }
 

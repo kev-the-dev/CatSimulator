@@ -50,8 +50,10 @@ public class Cat : MonoBehaviour
 	public Texture2D food_cursor;
 	public Texture2D laser_cursor;
 
+	// Laser pointer GameObject
+	GameObject laserPointer;
 	// Laser pointer GameObject's script
-	LaserPointer laserPointer;
+	LaserPointer laserPointerScript;
 	
 	float last_update_time;
 
@@ -64,8 +66,12 @@ public class Cat : MonoBehaviour
 		// Cat position for petting / brushing
 		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
 		
-		// Get the laser pointer game object's attached script
-		laserPointer = GameObject.Find("Laser Pointer").GetComponent<LaserPointer>();
+		// Get the laser pointer GameObject
+		laserPointer = GameObject.Find("Laser Pointer");
+		// Get the laser pointer GameObject's attached script
+		laserPointerScript = laserPointer.GetComponent<LaserPointer>();
+		// Deactivate laser pointer game object to turn it off
+		laserPointer.SetActive(false);
 		
 		// Initialize Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
@@ -97,26 +103,32 @@ public class Cat : MonoBehaviour
 		// Start off idle
 		activity = new CatActivity( CatActivityEnum.Idle );
 		
-		
+		// Initialize variables needed by behavior tree nodes
 		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
+		getPointDelegate getPointDel = laserPointerScript.getLaserIntersectionPoint;
 		
 		// Construct the cat's behavior tree
         autonomousCatBehaviorTree = new BehaviorTree(	new SelectorNode	( 	contextObject,
 		
-																				/* Energy Sequence */ 	new SequenceNode (	contextObject, 
-																															new CheckEnergyNode ( contextObject ),
-																															new SleepNode ( contextObject )
-																														),
-																				/* Hunger Sequence */	new SequenceNode ( 	contextObject,
-																															new CheckFullnessNode ( contextObject ),
-																															new CheckObjectStatusNode ( contextObject, GameObject.Find("food_in_bowl") ),
-																															new GoToObjectNode ( contextObject, GameObject.Find("Food Bowl") ),
-																															new EatNode ( contextObject, GameObject.Find("food_in_bowl") )
-																														),
-																				/* Wandering Sequence */new SequenceNode (	contextObject,
-																															new WaitNode ( contextObject, 5F),
-																															new GoToRandomPointNode ( contextObject )
-																														)
+																				/* Energy Sequence */				new SequenceNode 	(	contextObject, 
+																																			new CheckEnergyNode ( contextObject ),
+																																			new SleepNode ( contextObject )
+																																		),
+																				/* Hunger Sequence */				new SequenceNode 	( 	contextObject,
+																																			new CheckFullnessNode ( contextObject ),
+																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("food_in_bowl") ),
+																																			new GoToObjectNode ( contextObject, GameObject.Find("Food Bowl") ),
+																																			new EatNode ( contextObject, GameObject.Find("food_in_bowl") )
+																																		),
+																				/* Chase Laser Pointer Sequence */	new SequenceNode 	( 	contextObject,
+																																			new CheckObjectStatusNode ( contextObject, laserPointer ),
+																																			new GoToDynamicPointNode ( contextObject, getPointDel ),
+																																			new ChaseLaserNode ( contextObject )
+																																		),
+																				/* Wandering Sequence */			new SequenceNode 	(	contextObject,
+																																			new WaitNode ( contextObject, 5F),
+																																			new GoToRandomPointNode ( contextObject )
+																																		)
 																			)
 													);
 		autonomousCatBehaviorTree.paused = false;
@@ -176,41 +188,11 @@ public class Cat : MonoBehaviour
 		{
 			Camera.main.transform.LookAt(gameObject.transform); // Main camera look at cat
 		}
-		
-		// If in follow laser mode, follow laser
-		/*
-		if (CatActivityEnum.FollowingLaser == activity.current && SelectedTool.LASER_POINTER == selected_tool) {
-			GoToLaserPointer();
-		}
-		*/
 
 		// Log current state
 		Debug.Log(activity);
         //Debug.Log(stats);
     }
-
-	/*
-	// Set cats waypoint to whatever 3D point the cursor points to
-	void GoToLaserPointer()
-	{
-		// Find intersection of cursor and an object
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-		if(Physics.Raycast (ray, out hit))
-		{
-		 // Set waypoint to this point
-		 agent.destination = hit.point;
-		 // Update laser visualization
-		 Vector3[] line_points = {
-			 Camera.main.ScreenToWorldPoint(new Vector3(Camera.main.pixelWidth / 2, 0, Camera.main.nearClipPlane)),
-			 hit.point
-		 };
-		 laser_line.positionCount = line_points.Length;
-		 laser_line.SetPositions(line_points);
-		}
-	}
-	*/
 
 	// Load the cat from a previous save
 	public void Load()
@@ -275,13 +257,12 @@ public class Cat : MonoBehaviour
 		// If selected tool is not the laser pointer, ensure the laser pointer GameObject is turned off
 		if (tool != SelectedTool.LASER_POINTER)
 		{
-			laserPointer.poweredOn = false;
+			laserPointer.SetActive(false);
 		}
 		
 		// Log the change in tool
 		Debug.Log(string.Format("Selected Tool {0}", tool));
 		
-		// TODO: set cursor, change current activity, other behavior for each tool
 		Vector2 offset = new Vector2(0, 32);
 		
 		if (SelectedTool.HAND == tool)
@@ -299,10 +280,7 @@ public class Cat : MonoBehaviour
 		else if (SelectedTool.LASER_POINTER == tool) 
 		{
 			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
-			laserPointer.poweredOn = true;
-			
-			// TODO(Alex): only change activity if not otherwise busy
-			//activity.current = CatActivityEnum.FollowingLaser;
+			laserPointer.SetActive(true);
 		}
 
 		selected_tool = tool;
