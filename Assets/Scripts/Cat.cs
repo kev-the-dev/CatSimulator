@@ -16,10 +16,6 @@ public enum SelectedTool
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
 public class Cat : MonoBehaviour
 {
-	// Versioning for the scripting so load/saves across different versions do not create issues
-	// NOTE: MUST be incremented each time the script changes in a way that changes save/load functionality
-	private const int ScriptMajorVersion = 1;
-
 	// The cat's current stats, which appear on the HUD bars
 	CatStats stats;
 	// The cats permenant personality, initialized randomly
@@ -60,6 +56,11 @@ public class Cat : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+		if (AdoptionCenter.IsActive()) {
+			CreateNew();
+			return;
+		}
+
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
 		
@@ -85,13 +86,8 @@ public class Cat : MonoBehaviour
 		SelectTool(SelectedTool.HAND);
 
 		// If no previous save exists, create a new random cat
-		if (!PlayerPrefs.HasKey("script_version")) {
+		if (!GameSave.Valid()) {
 			Debug.Log("No previous save found, creating a cat");
-			CreateNew();
-			Save();
-		// If previous save was at a different game version, create new cat
-		} else if (PlayerPrefs.GetInt("script_version") != ScriptMajorVersion) {
-			Debug.Log("Previous save had a different script version, creating a cat");
 			CreateNew();
 			Save();
 		// Otherwise load cat back from save
@@ -144,10 +140,11 @@ public class Cat : MonoBehaviour
 		// Initialize last update time to now
 		last_update_time = Time.time;
     }
-	
+
 	// Called when there is no save to generate a new random cat
-	void CreateNew()
-	{	// Initialize stats for a completely content cat
+	public void CreateNew()
+	{
+		// Initialize stats for a completely content cat
 		stats = new CatStats();
 		// Initialize personality to random values
 		personality = CatPersonality.RandomPersonality();
@@ -158,6 +155,10 @@ public class Cat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		if (AdoptionCenter.IsActive()) {
+			return;
+		}
+
 		// TODO: autosave
 		//  Save game when S is pressed
         if(Input.GetKeyDown (KeyCode.S))
@@ -166,8 +167,10 @@ public class Cat : MonoBehaviour
         if (Input.GetKeyDown (KeyCode.L))
             Load();
 		// If R is pressed, reset
-		if (Input.GetKeyDown (KeyCode.R))
+		if (Input.GetKeyDown (KeyCode.R)) {
 			CreateNew();
+			GameSave.Clear();
+		}
 
 		// Calcuate time delta since last update, in seconds, fps-independent calculations
 		float dt = Time.time - last_update_time;
@@ -237,9 +240,7 @@ public class Cat : MonoBehaviour
 		PlayerPrefs.SetFloat("pose.r.z",gameObject.transform.rotation.z);
 		PlayerPrefs.SetFloat("pose.r.w",gameObject.transform.rotation.w);
 
-		PlayerPrefs.SetFloat("savetime", Time.time);
-		PlayerPrefs.SetInt("script_version", ScriptMajorVersion);
-		PlayerPrefs.Save();
+		GameSave.Commit();
 
 		Debug.Log("--- SAVED --");
 		Debug.Log(personality);
@@ -288,6 +289,10 @@ public class Cat : MonoBehaviour
 	
 	void OnMouseDown ()
 	{
+		if (AdoptionCenter.IsActive()) {
+			return;
+		}
+
 		Debug.Log("Clicked on cat.");
 		
 		// If mouse just went down, and the user is currently petting or brushing the cat, start counting drag time
@@ -300,6 +305,10 @@ public class Cat : MonoBehaviour
 
  	void OnMouseUp ()
 	{
+		if (AdoptionCenter.IsActive()) {
+			return;
+		}
+
 		// When mouse released, act based on accumulated drag
 		is_drag = false;
 		double drag_time = Time.time - drag_start_time;

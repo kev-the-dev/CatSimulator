@@ -13,6 +13,10 @@ public class CatStats
 		this.hygiene = hygiene;
 		this.bond = bond;
 
+		if (AdoptionCenter.IsActive()) {
+			return;
+		}
+
 		this.energy_slider = GameObject.Find("energy_slider").GetComponent <Slider> ();
 		this.fullness_slider = GameObject.Find("food_slider").GetComponent <Slider> ();
 		this.hygiene_slider = GameObject.Find("hygiene_slider").GetComponent <Slider> ();

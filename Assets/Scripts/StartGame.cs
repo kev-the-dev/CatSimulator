@@ -6,6 +6,10 @@ using UnityEngine.SceneManagement;
 public class StartGame : MonoBehaviour {
     public void StartGameAction()
     {
-        SceneManager.LoadScene(1);
+		if (GameSave.Valid()) {
+			SceneManager.LoadScene(1);
+		} else {
+			SceneManager.LoadScene(2);
+		}
     }
 }
