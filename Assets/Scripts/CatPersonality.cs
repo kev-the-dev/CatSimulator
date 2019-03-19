@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CatPersonality
 {
@@ -11,7 +12,17 @@ public class CatPersonality
 		this.sociability = sociability;
 		this.sleep_threshold = sleep_threshold;
 		this.hunger_threshold = hunger_threshold;
-		
+
+		// If in adoption mode, set card sliders
+		if (AdoptionCenter.IsActive()) {
+			GameObject.Find("hungriness_slider").GetComponent<Slider>().value = (int) 100 * this.hungriness;
+			GameObject.Find("tierdness_slider").GetComponent<Slider>().value = (int) 100 * this.tierdness;
+			GameObject.Find("playfullness_slider").GetComponent<Slider>().value = (int) 100 * this.playfullness;
+			GameObject.Find("cleanlieness_slider").GetComponent<Slider>().value = (int) 100 * this.cleanlieness;
+			GameObject.Find("sociability_slider").GetComponent<Slider>().value = (int) 100 * this.sociability;
+			return;
+		}
+
 		// Debug Values
 		/*
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
