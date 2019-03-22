@@ -21,6 +21,23 @@ public class PrimitiveNode : Node
 	}
 }
 
+// TODO: test this
+public class CustomCheckNode : PrimitiveNode
+{
+	public delegate NodeStatus customCheckFunction();
+	customCheckFunction function;
+	
+	public CustomCheckNode (Context _context, customCheckFunction _function) : base (_context)
+	{
+		function = _function;
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		return function();
+	}
+}
+
 
 // Decorators
 public class LoopNode : Node
