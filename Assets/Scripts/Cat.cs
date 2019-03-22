@@ -14,16 +14,10 @@ public enum SelectedTool
 }
 
 // Behavior script for the cat. Manages the cats behaviors, stats, and personality
-public class Cat : MonoBehaviour
+public class Cat : BaseCat
 {
-	// The cat's current stats, which appear on the HUD bars
-	CatStats stats;
-	// The cats permenant personality, initialized randomly
-	CatPersonality personality;
 	// The cat's current activity/behavior/goal
 	CatActivity activity;
-	// The cat's style (color, fur)
-	CatStyle style;
 	
 	NavMeshAgent agent;
 	
@@ -56,11 +50,6 @@ public class Cat : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		if (AdoptionCenter.IsActive()) {
-			CreateNew();
-			return;
-		}
-
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
 		
@@ -85,16 +74,20 @@ public class Cat : MonoBehaviour
 		laser_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LASER_POINTER);});
 		SelectTool(SelectedTool.HAND);
 
-		// If no previous save exists, create a new random cat
+		// Previous save should always exist (otherwise adoption center would be loaded)
+		// If for some reason we got here, crash.
 		if (!GameSave.Valid()) {
-			Debug.Log("No previous save found, creating a cat");
-			CreateNew();
-			Save();
-		// Otherwise load cat back from save
-		} else {
-			Debug.Log("Previous save found, loading");
-			Load();
+			Debug.Log("LivingRoom loaded without a save! Quiting.");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit ();
+			return;
+#endif
 		}
+
+		// Load previous save / adopted cat
+		Load();
 
 		// Start off idle
 		activity = new CatActivity( CatActivityEnum.Idle );
@@ -141,24 +134,9 @@ public class Cat : MonoBehaviour
 		last_update_time = Time.time;
     }
 
-	// Called when there is no save to generate a new random cat
-	public void CreateNew()
-	{
-		// Initialize stats for a completely content cat
-		stats = new CatStats();
-		// Initialize personality to random values
-		personality = CatPersonality.RandomPersonality();
-		// Initialize the style to random color
-		style = CatStyle.RandomStyle();
-	}
-
     // Update is called once per frame
     void Update()
     {
-		if (AdoptionCenter.IsActive()) {
-			return;
-		}
-
 		// TODO: autosave
 		//  Save game when S is pressed
         if(Input.GetKeyDown (KeyCode.S))
@@ -196,58 +174,6 @@ public class Cat : MonoBehaviour
 		Debug.Log(activity);
         //Debug.Log(stats);
     }
-
-	// Load the cat from a previous save
-	public void Load()
-	{
-		// Load personality, stats and style
-		personality = CatPersonality.Load();
-		stats = CatStats.Load();
-		style = CatStyle.Load();
-
-		// Load cat pose
-		Quaternion r = new Quaternion(PlayerPrefs.GetFloat("pose.r.x"),
-			PlayerPrefs.GetFloat("pose.r.y"),
-			PlayerPrefs.GetFloat("pose.r.z"),
-			PlayerPrefs.GetFloat("pose.r.w"));
-		Vector3 p = new Vector3(PlayerPrefs.GetFloat("pose.p.x"),
-			PlayerPrefs.GetFloat("pose.p.y"),
-			PlayerPrefs.GetFloat("pose.p.z"));
-		gameObject.transform.SetPositionAndRotation(p, r);
-		// TODO: color, other info
-		
-		Debug.Log("--- LOADED --");
-		Debug.Log(personality);
-		Debug.Log(stats);
-		Debug.Log(style);
-		Debug.Log("-------------");
-	}
-
-	// Save the current cat to a file for later resuming play
-	public void Save()
-	{
-		// Save personality, stats, and style
-		personality.Save();
-		stats.Save();
-		style.Save();
-
-		// Save pose
-		PlayerPrefs.SetFloat("pose.p.x",gameObject.transform.position.x);
-		PlayerPrefs.SetFloat("pose.p.y",gameObject.transform.position.y);
-		PlayerPrefs.SetFloat("pose.p.z",gameObject.transform.position.z);
-		PlayerPrefs.SetFloat("pose.r.x",gameObject.transform.rotation.x);
-		PlayerPrefs.SetFloat("pose.r.y",gameObject.transform.rotation.y);
-		PlayerPrefs.SetFloat("pose.r.z",gameObject.transform.rotation.z);
-		PlayerPrefs.SetFloat("pose.r.w",gameObject.transform.rotation.w);
-
-		GameSave.Commit();
-
-		Debug.Log("--- SAVED --");
-		Debug.Log(personality);
-		Debug.Log(stats);
-		Debug.Log(style);
-		Debug.Log("-------------");
-	}
 
 	// Change the currently selected tool
 	void SelectTool(SelectedTool tool)
@@ -289,10 +215,6 @@ public class Cat : MonoBehaviour
 	
 	void OnMouseDown ()
 	{
-		if (AdoptionCenter.IsActive()) {
-			return;
-		}
-
 		Debug.Log("Clicked on cat.");
 		
 		// If mouse just went down, and the user is currently petting or brushing the cat, start counting drag time
@@ -305,10 +227,6 @@ public class Cat : MonoBehaviour
 
  	void OnMouseUp ()
 	{
-		if (AdoptionCenter.IsActive()) {
-			return;
-		}
-
 		// When mouse released, act based on accumulated drag
 		is_drag = false;
 		double drag_time = Time.time - drag_start_time;

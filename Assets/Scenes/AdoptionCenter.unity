@@ -3343,13 +3343,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2080741518}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8043cc554c308648ae27b41d73ca0bf, type: 3}
+  m_Script: {fileID: 11500000, guid: 77a3bde1b9ff3d240b0773d580dbc2e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hand_cursor: {fileID: 2800000, guid: a4e0452e634080141bc2172bbe81fd30, type: 3}
-  brush_cursor: {fileID: 2800000, guid: 028d9d3b97f7f61479297504f7b1512c, type: 3}
-  food_cursor: {fileID: 2800000, guid: 13c79332b3ec8f2498e12a1b1a1a3844, type: 3}
-  laser_cursor: {fileID: 2800000, guid: 2878ee32a3d37614294d7b069c0e6401, type: 3}
 --- !u!4 &2080741523
 Transform:
   m_ObjectHideFlags: 0

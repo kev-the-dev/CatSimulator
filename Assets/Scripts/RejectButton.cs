@@ -6,6 +6,6 @@ public class RejectButton : MonoBehaviour {
     public void RejectButtonAction()
     {
 		Debug.Log("Rejecting");
-		GameObject.Find("Cat").GetComponent<Cat>().CreateNew();
+		GameObject.Find("Cat").GetComponent<BaseCat>().CreateNew();
     }
 }
