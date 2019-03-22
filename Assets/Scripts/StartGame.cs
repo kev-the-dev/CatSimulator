@@ -7,9 +7,9 @@ public class StartGame : MonoBehaviour {
     public void StartGameAction()
     {
 		if (GameSave.Valid()) {
-			SceneManager.LoadScene(1);
+			SceneManager.LoadScene("LivingRoom");
 		} else {
-			SceneManager.LoadScene(2);
+			SceneManager.LoadScene("AdoptionCenter");
 		}
     }
 }

@@ -6,6 +6,6 @@ public class AdoptButton : MonoBehaviour {
     {
 		Debug.Log("Adopting");
 		GameObject.Find("Cat").GetComponent<Cat>().Save();
-		SceneManager.LoadScene(1);
+		SceneManager.LoadScene("LivingRoom");
     }
 }
