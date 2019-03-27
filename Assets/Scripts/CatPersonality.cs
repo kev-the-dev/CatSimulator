@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F, float bladder_threshold = 0.25F)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;
@@ -12,6 +12,7 @@ public class CatPersonality
 		this.sociability = sociability;
 		this.sleep_threshold = sleep_threshold;
 		this.hunger_threshold = hunger_threshold;
+		this.bladder_threshold = bladder_threshold;
 
 		// If in adoption mode, set card sliders
 		if (AdoptionCenter.IsActive()) {
@@ -53,6 +54,8 @@ public class CatPersonality
 		this.fun_increase_when_on_catnip_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.hygiene_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.cleanlieness);
 		this.hygiene_increase_when_being_brushed_per_second = CalculateMultipier(0.1F, 0.2F, this.cleanlieness);
+		this.bladder_decrease_per_second = 0.01F;
+		this.bladder_increase_when_using_litter_box_per_second = 0.1F;
 	}
 
 	// Generates and returns a random cat personality
@@ -93,10 +96,13 @@ public class CatPersonality
 	private float fun_increase_when_on_catnip_per_second;
 	private float hygiene_decrease_per_second;
 	private float hygiene_increase_when_being_brushed_per_second;
+	private float bladder_decrease_per_second;
+	private float bladder_increase_when_using_litter_box_per_second;
 	
 	// Threshold values
 	public float sleep_threshold {get; private set;}		// Cat falls asleep when energy reaches this level
 	public float hunger_threshold {get; private set;}		// Cat tries to eat when fullness reaches this level
+	public float bladder_threshold {get; private set;}		// Cat uses the litter box when bladder stat reaches this level
 	
 	public override string ToString()
 	{
@@ -155,6 +161,16 @@ public class CatPersonality
 			stats.Hygiene += dt * hygiene_increase_when_being_brushed_per_second;
 		} else {
 			stats.Hygiene -= dt * hygiene_decrease_per_second;
+		}
+		
+		// Update bladder
+		if (CatActivityEnum.UsingLitterbox == activity.current) 
+		{
+			stats.Bladder += dt * bladder_increase_when_using_litter_box_per_second;
+		}
+		else
+		{
+			stats.Bladder -= dt * bladder_decrease_per_second;
 		}
 	}
 	

@@ -178,7 +178,7 @@ public class Cat : BaseCat
 
 		// Log current state
 		Debug.Log(activity);
-        //Debug.Log(stats);
+        Debug.Log(stats);
     }
 
 	// Change the currently selected tool

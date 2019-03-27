@@ -7,11 +7,17 @@ public class LitterBox : MonoBehaviour
 	GameObject poop;
 	Cat catScript;
 	
+	// Called before Start. 
+	void Awake()
+	{
+		poop = GameObject.Find("Poop");
+		catScript = GameObject.Find("Cat").GetComponent<Cat>();
+	}
+	
     // Start is called before the first frame update
     void Start()
     {
-        poop = GameObject.Find("Poop");
-		catScript = GameObject.Find("Cat").GetComponent<Cat>();
+        poop.SetActive(false);
     }
 
     // Update is called once per frame
@@ -19,14 +25,14 @@ public class LitterBox : MonoBehaviour
     {
         
     }
-	/*
+	
 	void OnMouseDown()
 	{
-		if (catScript.selected_tool == SelectedTool.LITTERBOXSCOOPER)
+		if (catScript.selected_tool == SelectedTool.LITTER_SCOOPER)
 		{
-			poop.SetActive(true);
+			poop.SetActive(false);
 		}
 
 	}
-	*/
+	
 }

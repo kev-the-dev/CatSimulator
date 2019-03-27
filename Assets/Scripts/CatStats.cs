@@ -5,12 +5,13 @@ using UnityEngine.UI;
 // Defines the current stats of the cat, which are displayed as bars in the HUD and influence behavior
 public class CatStats
 {
-	public CatStats(float energy = MAX, float fullness = MAX, float fun = MAX, float hygiene = MAX, float bond = MAX)
+	public CatStats(float energy = MAX, float fullness = MAX, float fun = MAX, float hygiene = MAX, float bladder = MAX, float bond = MAX)
 	{
 		this.energy = energy;
 		this.fullness = fullness;
 		this.fun = fun;
 		this.hygiene = hygiene;
+		this.bladder = bladder;
 		this.bond = bond;
 
 		if (AdoptionCenter.IsActive()) {
@@ -32,19 +33,26 @@ public class CatStats
 	public const float HAPPIENESS_INDICATOR_THRESHOLD = MAX * 0.75F;
 	public const float MEOW_PERIOD = 10F;
 
-	// TODO: use autoproperties to enforce MIN/MAX
 	// How energetic the cat is, when maximized cat has no desire for sleep
 	private float energy;
 	public float Energy {get {return energy;} set {energy = Math.Min(MAX, Math.Max(value, MIN));}}
+	
 	// Inverse of hunger, when maximized cat has no desire for food
 	private float fullness;
 	public float Fullness {get {return fullness;} set {fullness = Math.Min(MAX, Math.Max(value, MIN));}}
+	
 	// How much fun cat is having, when maximized cat is having, like, a lot of fun
 	private float fun;
 	public float Fun {get {return fun;} set {fun = Math.Min(MAX, Math.Max(value, MIN));}}
+	
 	// How clean the cat and its environment is. When maximized, cat is content with its hygiene
 	private float hygiene;
 	public float Hygiene {get {return hygiene;} set {hygiene = Math.Min(MAX, Math.Max(value, MIN));}}
+	
+	// How much the cat needs to use the bathroom
+	private float bladder;
+	public float Bladder {get {return bladder;} set {bladder = Math.Min(MAX, Math.Max(value, MIN));}}
+	
 	// How connected cat is with the owner
 	private float bond;
 	public float Bond {get {return bond;} set {bond = Math.Min(MAX, Math.Max(value, MIN));}}
@@ -62,7 +70,7 @@ public class CatStats
 	// The total happieness/contentness of the cat. When == MAX, all desires of cat are satisfied
 	public float happieness()
 	{
-		return (energy + fullness + fun + hygiene) / (4.0F * MAX);
+		return (energy + fullness + fun + hygiene + bladder) / (5.0F * MAX);
 	}
 
 	// Update the stat bars with the current stats
@@ -85,8 +93,8 @@ public class CatStats
 
 	public override string ToString()
 	{
-		return string.Format("CatStats(Energy={0} Fullness={1} Fun={2} Hygiene={3} Bond={4} Happieness={5})",
-							 energy, fullness, fun, hygiene, bond, happieness());
+		return string.Format("CatStats(Energy={0} Fullness={1} Fun={2} Hygiene={3} Bladder={4} Bond={5} Happieness={6})",
+							 energy, fullness, fun, hygiene, bladder, bond, happieness());
 	}
 	
 	public void Save()
@@ -95,6 +103,7 @@ public class CatStats
 		PlayerPrefs.SetFloat("stats.fullness", Fullness);
 		PlayerPrefs.SetFloat("stats.fun", Fun);
 		PlayerPrefs.SetFloat("stats.hygiene", Hygiene);
+		PlayerPrefs.SetFloat("stats.bladder", Bladder);
 		PlayerPrefs.SetFloat("stats.bond", Bond);
 	}
 	
@@ -104,6 +113,7 @@ public class CatStats
 		                    PlayerPrefs.GetFloat("stats.fullness"),
 							PlayerPrefs.GetFloat("stats.fun"),
 							PlayerPrefs.GetFloat("stats.hygiene"),
+							PlayerPrefs.GetFloat("stats.bladder"),
 							PlayerPrefs.GetFloat("stats.bond"));
 	}
 }
