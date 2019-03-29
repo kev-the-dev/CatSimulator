@@ -4,20 +4,24 @@ using UnityEngine;
 
 public class LitterBox : MonoBehaviour
 {
-	GameObject poop;
+	GameObject[] poops;
 	Cat catScript;
 	
 	// Called before Start. 
 	void Awake()
 	{
-		poop = GameObject.Find("Poop");
+		poops = GameObject.FindGameObjectsWithTag("poop");
 		catScript = GameObject.Find("Cat").GetComponent<Cat>();
 	}
 	
     // Start is called before the first frame update
     void Start()
     {
-        poop.SetActive(false);
+		foreach (GameObject poop in poops)
+		{
+			poop.SetActive(false);
+		}
+        
     }
 
     // Update is called once per frame
@@ -30,7 +34,15 @@ public class LitterBox : MonoBehaviour
 	{
 		if (catScript.selected_tool == SelectedTool.LITTER_SCOOPER)
 		{
-			poop.SetActive(false);
+			// Find first active poop
+			foreach (GameObject poop in poops)
+			{
+				if (poop.activeSelf == true)
+				{
+					poop.SetActive(false);
+					return;
+				}
+			}
 		}
 
 	}

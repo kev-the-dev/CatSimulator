@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F, float bladder_threshold = 0.25F)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F, float bladder_threshold = 0.2F)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;

@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public class GoToObjectNode : PrimitiveNode
 {
 	private GameObject destination {get; set;}
+	private Transform destinationTransform;
 	private Vector3 destinationPosition;
 	private NavMeshAgent catAgent;
 	private Transform catTransform;
@@ -19,6 +20,7 @@ public class GoToObjectNode : PrimitiveNode
 		// If condition == false, the debug message is displayed
 		Debug.Assert(_destination != null, "GoToObjectNode.GoToObjectNode(): Passed a null destination to the constructor.");
 		destination = _destination;
+		destinationTransform = _destination.GetComponent<Transform>();
 		catAgent = contextObj.parentCat.GetComponent<NavMeshAgent>();
 		catAgent.stoppingDistance = 2F;
 		catTransform = contextObj.parentCat.GetComponent<Transform>();
@@ -28,7 +30,7 @@ public class GoToObjectNode : PrimitiveNode
 	{
 		// Update destination GameObject's position in case the GameObject has moved
 		NavMeshHit hit;
-		bool result = NavMesh.SamplePosition(destination.GetComponent<Transform>().position, out hit, roomRadius, 1);
+		bool result = NavMesh.SamplePosition(destinationTransform.position, out hit, roomRadius, 1);
 		
 		if (result) 
 		{
@@ -328,6 +330,54 @@ public class EatNode : PrimitiveNode
 	
 }
 
+public class RelieveBladderNode : PrimitiveNode
+{
+	GameObject[] poops;
+	int numberOfPoops;
+	
+	public RelieveBladderNode (Context _context) : base (_context)
+	{
+		poops = GameObject.FindGameObjectsWithTag("poop");	// Returns an array of all GameObjects with the tag "poop"
+		numberOfPoops = poops.Length; // Total number of elements in the array
+		
+		if (numberOfPoops == 0)
+		{
+			Debug.Log("RelieveBladderNode(): No poops found.");
+		}
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		// If not already relieving self, make cat relieve self
+		if (contextObj.activity.current != CatActivityEnum.UsingLitterbox)
+		{
+			contextObj.activity.current = CatActivityEnum.UsingLitterbox;
+		}
+		// Check bladder static
+		if (contextObj.stats.Bladder < CatStats.MAX)
+		{
+			return NodeStatus.Running;
+		}
+		
+		// Make cat stop relieving itself
+		
+		// Find first deactivated poop and activate it
+		foreach (GameObject poop in poops)
+		{
+			if (poop.activeSelf == false) 
+			{
+				poop.SetActive(true);
+				contextObj.activity.current = CatActivityEnum.Idle;
+				return NodeStatus.Success;
+			}
+		}
+		
+		contextObj.activity.current = CatActivityEnum.Idle;
+		return NodeStatus.Success;
+		
+	}
+}
+
 public class FocusOnUserNode : PrimitiveNode
 {
 	Cat catScript;
@@ -436,6 +486,38 @@ public class CheckFullnessNode : PrimitiveNode
 		
 		return NodeStatus.Failure;
 	}
+}
+
+public class CheckBladderNode : PrimitiveNode
+{
+	float bladderThreshold;
+	
+	public CheckBladderNode (Context _context) : base (_context)
+	{
+		bladderThreshold = contextObj.personality.bladder_threshold;
+	}
+	
+	public CheckBladderNode (Context _context, float _custom_bladder_threshold) : base (_context)
+	{
+		bladderThreshold = _custom_bladder_threshold;
+	}
+	
+	public override NodeStatus run ( float _time )
+	{
+		// if already using litter box, return success
+		if (contextObj.activity.current == CatActivityEnum.UsingLitterbox)
+		{
+			return NodeStatus.Success;
+		}
+		// If not already using litter box, but cat needs to use the litter box, return Success
+		else if (contextObj.stats.Bladder < bladderThreshold)
+		{
+			return NodeStatus.Success;
+		}
+		
+		return NodeStatus.Failure;
+	}
+	
 }
 
 public class CheckObjectStatusNode : PrimitiveNode

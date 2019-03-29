@@ -109,6 +109,11 @@ public class Cat : BaseCat
 																																			new CheckEnergyNode ( contextObject ),
 																																			new SleepNode ( contextObject )
 																																		),
+																				/* Bladder Sequence */				new SequenceNode	(	contextObject,
+																																			new CheckBladderNode ( contextObject ),
+																																			new GoToObjectNode ( contextObject, GameObject.Find("Litterbox") ),
+																																			new RelieveBladderNode ( contextObject )
+																																		),
 																				/* Hunger Sequence */				new SequenceNode 	( 	contextObject,
 																																			new CheckFullnessNode ( contextObject ),
 																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("food_in_bowl") ),
