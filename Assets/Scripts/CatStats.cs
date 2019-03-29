@@ -22,6 +22,8 @@ public class CatStats
 		this.fullness_slider = GameObject.Find("food_slider").GetComponent <Slider> ();
 		this.hygiene_slider = GameObject.Find("hygiene_slider").GetComponent <Slider> ();
 		this.fun_slider = GameObject.Find("fun_slider").GetComponent <Slider> ();
+		this.bladder_slider = GameObject.Find("bladder_slider").GetComponent <Slider> ();
+		
 		this.happy_indicator = GameObject.Find("happy_indicator").GetComponent<Renderer>();
 		this.meow_sound = GameObject.Find("meow_sound").GetComponent<AudioSource>();
 	}
@@ -62,6 +64,8 @@ public class CatStats
 	private Slider fullness_slider;
 	private Slider fun_slider;
 	private Slider hygiene_slider;
+	private Slider bladder_slider;
+	
 	// Happineness indicator
 	private Renderer happy_indicator;
 	private AudioSource meow_sound;
@@ -80,6 +84,8 @@ public class CatStats
 		this.fullness_slider.value = fullness;
 		this.fun_slider.value = fun;
 		this.hygiene_slider.value = hygiene;
+		this.bladder_slider.value = bladder;
+		
 		if (happieness() > HAPPIENESS_INDICATOR_THRESHOLD) {
 			this.happy_indicator.enabled = true;
 			if (Time.time - last_meow > MEOW_PERIOD) {
