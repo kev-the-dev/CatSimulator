@@ -21,7 +21,7 @@ public class CatStats
 		this.fullness_slider = GameObject.Find("food_slider").GetComponent <Slider> ();
 		this.hygiene_slider = GameObject.Find("hygiene_slider").GetComponent <Slider> ();
 		this.fun_slider = GameObject.Find("fun_slider").GetComponent <Slider> ();
-		this.happy_indicator = GameObject.Find("happy_indicator").GetComponent<Renderer>();
+		this.happy_indicator = GameObject.Find("HeartParticles").GetComponent<Renderer>();
 		this.meow_sound = GameObject.Find("meow_sound").GetComponent<AudioSource>();
 	}
 
