@@ -148,6 +148,8 @@ public class Cat : BaseCat
     // Update is called once per frame
     void Update()
     {
+		achievements.GetNewUnlocks();
+
 		// TODO: autosave
 		//  Save game when S is pressed
         if(Input.GetKeyDown (KeyCode.S))
@@ -182,8 +184,9 @@ public class Cat : BaseCat
 		}
 
 		// Log current state
-		Debug.Log(activity);
-        Debug.Log(stats);
+		//Debug.Log(activity);
+        //Debug.Log(stats);
+		//Debug.Log(achievements);
     }
 
 	// Change the currently selected tool
@@ -230,7 +233,7 @@ public class Cat : BaseCat
 	
 	void OnMouseDown ()
 	{
-		Debug.Log("Clicked on cat.");
+		//Debug.Log("Clicked on cat.");
 		
 		// If mouse just went down, and the user is currently petting or brushing the cat, start counting drag time
 		if ((!is_drag) && (SelectedTool.HAND == selected_tool || SelectedTool.BRUSH == selected_tool)) {
@@ -261,11 +264,13 @@ public class Cat : BaseCat
 			if (selected_tool == SelectedTool.HAND)
 			{
 				activity.current = CatActivityEnum.BeingPet;
+				achievements.num_pets++;
 			}
 			// If using brush tool, register as brushing
 			else if (selected_tool == SelectedTool.BRUSH)
 			{
 				activity.current = CatActivityEnum.BeingBrushed;
+				achievements.num_brushes++;
 			}
 		}
 

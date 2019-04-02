@@ -35,11 +35,11 @@ public class GoToObjectNode : PrimitiveNode
 		if (result) 
 		{
 			destinationPosition = hit.position;
-			Debug.Log("GoToObjectNode.run(): Found a hit. destinationPosition = " + destinationPosition.ToString() );
+			//Debug.Log("GoToObjectNode.run(): Found a hit. destinationPosition = " + destinationPosition.ToString() );
 		}
 		else 
 		{
-			Debug.Log("GoToObjectNode.run(): No valid position found within NavMesh.");
+			//Debug.Log("GoToObjectNode.run(): No valid position found within NavMesh.");
 			return NodeStatus.Failure;
 		}
 		
@@ -52,13 +52,13 @@ public class GoToObjectNode : PrimitiveNode
 		{
 			// Attempts to set destination. Returns true if the destination was successfully requested. Returns false if the path is still being calculated or if no path exists.
 			setDestinationResult = catAgent.SetDestination(destinationPosition);
-			Debug.Log("GoToObjectNode.run(): Travelling to destination...");
-			Debug.Log("GoToObjectNode.run(): Distance from destination: " + ((catTransform.position - destinationPosition).magnitude).ToString() );
+			//Debug.Log("GoToObjectNode.run(): Travelling to destination...");
+			//Debug.Log("GoToObjectNode.run(): Distance from destination: " + ((catTransform.position - destinationPosition).magnitude).ToString() );
 			
 			// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
 			if ( setDestinationResult == false && !(catAgent.pathPending) )
 			{
-				Debug.Log("GoToObjectNode.run(): Path not found.");
+				//Debug.Log("GoToObjectNode.run(): Path not found.");
 				return NodeStatus.Failure;
 			}
 			
@@ -94,11 +94,11 @@ public class GoToPointNode : PrimitiveNode
 		if (result) 
 		{
 			pointOnNavMesh = hit.position;
-			Debug.Log("GoToPointNode(): Found a hit. destinationPosition = " + pointOnNavMesh.ToString() );
+			//Debug.Log("GoToPointNode(): Found a hit. destinationPosition = " + pointOnNavMesh.ToString() );
 		}
 		else 
 		{
-			Debug.Log("GoToPointNode(): No valid position found within NavMesh.");
+			//Debug.Log("GoToPointNode(): No valid position found within NavMesh.");
 		}
 	}
 	
@@ -164,11 +164,11 @@ public class GoToDynamicPointNode : PrimitiveNode
 		if (result) 
 		{
 			pointOnNavMesh = hit.position;
-			Debug.Log("GoToDynamicPointNode(): Found a hit. destinationPosition = " + pointOnNavMesh.ToString() );
+			//Debug.Log("GoToDynamicPointNode(): Found a hit. destinationPosition = " + pointOnNavMesh.ToString() );
 		}
 		else 
 		{
-			Debug.Log("GoToDynamicPointNode(): No valid position found within NavMesh.");
+			//Debug.Log("GoToDynamicPointNode(): No valid position found within NavMesh.");
 		}
 		
 		// If cat is at (or approximately at) destination...
@@ -229,19 +229,19 @@ public class GoToRandomPointNode : PrimitiveNode
 		else {
 			point = RandomWaypoint();
 			pointSet = true;
-			Debug.Log("GoToRandomPointNode.run(): Destination is: " + point.ToString() );
+			//Debug.Log("GoToRandomPointNode.run(): Destination is: " + point.ToString() );
 		}
 		
 		// Attempts to set destination. Returns true if the destination was successfully requested. Returns false if the path is still being calculated or if no path exists.
 		setDestinationResult = catAgent.SetDestination(point);
 		
-		Debug.Log("GoToRandomPointNode.run(): Travelling to destination...");
-		Debug.Log("GoToRandomPointNode.run(): Distance from destination: " + ((catTransform.position - point).magnitude).ToString() );
+		//Debug.Log("GoToRandomPointNode.run(): Travelling to destination...");
+		//Debug.Log("GoToRandomPointNode.run(): Distance from destination: " + ((catTransform.position - point).magnitude).ToString() );
 		
 		// If the call to SetDestination failed and the path is not still being calculated, return NodeStatus.Failure
 		if ( (setDestinationResult == false) && !(catAgent.pathPending) )
 		{
-			Debug.Log("GoToObjectNode.run(): Path not found.");
+			//Debug.Log("GoToObjectNode.run(): Path not found.");
 			return NodeStatus.Failure;
 		}
 		
@@ -392,7 +392,7 @@ public class FocusOnUserNode : PrimitiveNode
 	
 	public override NodeStatus run (float _time)
 	{
-		Debug.Log("FocusOnUserNode.run(): Focusing on user...");
+		//Debug.Log("FocusOnUserNode.run(): Focusing on user...");
 		
 		// If maxFocusTimespan elapses since the last user interaction...
 		if ((Time.time - catScript.time_of_last_user_interaction) > maxFocusTimespan)
