@@ -23,5 +23,6 @@ public enum CatActivityEnum
 	BeingPet, 
 	FollowingLaser, 
 	PlayingWithYarn, 
+	UsingLitterbox,
 	OnCatnip
 }

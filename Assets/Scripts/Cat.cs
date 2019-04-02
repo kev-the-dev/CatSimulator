@@ -10,6 +10,7 @@ public enum SelectedTool
 	HAND,
 	FOOD,
 	BRUSH,
+	LITTER_SCOOPER,
 	LASER_POINTER
 }
 
@@ -33,12 +34,13 @@ public class Cat : BaseCat
 	public float time_of_last_user_interaction {get; private set;}
 	
 	// UI Buttons
-	private Button hand_button, brush_button, food_button, laser_button, liter_button;
+	private Button hand_button, brush_button, food_button, laser_button, litter_button;
 	public SelectedTool selected_tool {get; private set;}
 	public Texture2D hand_cursor;
 	public Texture2D brush_cursor;
 	public Texture2D food_cursor;
 	public Texture2D laser_cursor;
+	public Texture2D litter_cursor;
 
 	// Laser pointer GameObject
 	GameObject laserPointer;
@@ -63,15 +65,19 @@ public class Cat : BaseCat
 		// Deactivate laser pointer game object to turn it off
 		laserPointer.SetActive(false);
 		
-		// Initialize Buttons
+		// Get Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
 		brush_button = GameObject.Find("brush_button").GetComponent<Button>();
 		food_button = GameObject.Find("food_button").GetComponent<Button>();
 		laser_button = GameObject.Find("laser_button").GetComponent<Button>();
+		litter_button = GameObject.Find("litter_button").GetComponent<Button>();
+		// Initialize listeners
 		hand_button.onClick.AddListener(delegate {SelectTool(SelectedTool.HAND);});
 		brush_button.onClick.AddListener(delegate {SelectTool(SelectedTool.BRUSH);});
 		food_button.onClick.AddListener(delegate {SelectTool(SelectedTool.FOOD);});
 		laser_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LASER_POINTER);});
+		litter_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LITTER_SCOOPER);});
+		// Default to hand tool
 		SelectTool(SelectedTool.HAND);
 
 		// Previous save should always exist (otherwise adoption center would be loaded)
@@ -102,6 +108,11 @@ public class Cat : BaseCat
 																				/* Energy Sequence */				new SequenceNode 	(	contextObject, 
 																																			new CheckEnergyNode ( contextObject ),
 																																			new SleepNode ( contextObject )
+																																		),
+																				/* Bladder Sequence */				new SequenceNode	(	contextObject,
+																																			new CheckBladderNode ( contextObject ),
+																																			new GoToObjectNode ( contextObject, GameObject.Find("Litterbox") ),
+																																			new RelieveBladderNode ( contextObject )
 																																		),
 																				/* Hunger Sequence */				new SequenceNode 	( 	contextObject,
 																																			new CheckFullnessNode ( contextObject ),
@@ -172,7 +183,7 @@ public class Cat : BaseCat
 
 		// Log current state
 		Debug.Log(activity);
-        //Debug.Log(stats);
+        Debug.Log(stats);
     }
 
 	// Change the currently selected tool
@@ -208,6 +219,10 @@ public class Cat : BaseCat
 		{
 			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
 			laserPointer.SetActive(true);
+		}
+		else if (SelectedTool.LITTER_SCOOPER == tool)
+		{
+			Cursor.SetCursor(litter_cursor, offset, CursorMode.Auto);
 		}
 
 		selected_tool = tool;

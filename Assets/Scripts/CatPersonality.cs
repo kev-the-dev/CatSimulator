@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F, float bladder_threshold = 0.2F)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;
@@ -12,6 +12,7 @@ public class CatPersonality
 		this.sociability = sociability;
 		this.sleep_threshold = sleep_threshold;
 		this.hunger_threshold = hunger_threshold;
+		this.bladder_threshold = bladder_threshold;
 
 		// If in adoption mode, set card sliders
 		if (AdoptionCenter.IsActive()) {
@@ -53,6 +54,8 @@ public class CatPersonality
 		this.fun_increase_when_on_catnip_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.hygiene_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.cleanlieness);
 		this.hygiene_increase_when_being_brushed_per_second = CalculateMultipier(0.1F, 0.2F, this.cleanlieness);
+		this.bladder_decrease_per_second = CalculateMultipier(0.01F, 0.02F, Random.Range(MIN, MAX));
+		this.bladder_increase_when_using_litter_box_per_second = CalculateMultipier(0.1F, 0.2F, Random.Range(MIN, MAX));
 	}
 
 	// Generates and returns a random cat personality
@@ -93,10 +96,13 @@ public class CatPersonality
 	private float fun_increase_when_on_catnip_per_second;
 	private float hygiene_decrease_per_second;
 	private float hygiene_increase_when_being_brushed_per_second;
+	private float bladder_decrease_per_second;
+	private float bladder_increase_when_using_litter_box_per_second;
 	
 	// Threshold values
 	public float sleep_threshold {get; private set;}		// Cat falls asleep when energy reaches this level
 	public float hunger_threshold {get; private set;}		// Cat tries to eat when fullness reaches this level
+	public float bladder_threshold {get; private set;}		// Cat uses the litter box when bladder stat reaches this level
 	
 	public override string ToString()
 	{
@@ -126,35 +132,76 @@ public class CatPersonality
 		}
 
 		// Update fullness
-		if (CatActivityEnum.Eating == activity.current) {
+		if (CatActivityEnum.Eating == activity.current) 
+		{
 			stats.Fullness += dt * fullness_increase_when_eating_per_second;
-		} else {
+		} 
+		else 
+		{
 			stats.Fullness -= dt * fullness_decrease_per_second;
 		}
 
 		// Update energy
-		if (CatActivityEnum.Sleeping == activity.current) {
+		if (CatActivityEnum.Sleeping == activity.current) 
+		{
 			stats.Energy += dt * energy_increase_when_sleeping_per_second;
-		} else {
+		} 
+		else 
+		{
 			stats.Energy -= dt * energy_decrease_per_second;
 		}
 
-		// Update playfullness
-		if (CatActivityEnum.PlayingWithYarn == activity.current) {
+		// Update fun
+		if (CatActivityEnum.PlayingWithYarn == activity.current) 
+		{
 			stats.Fun += dt * fun_increase_when_playing_with_yarn_per_second;
-		} else if (CatActivityEnum.FollowingLaser == activity.current) {
+		} 
+		else if (CatActivityEnum.FollowingLaser == activity.current) 
+		{
 			stats.Fun += dt * fun_increase_when_following_laser_per_second;
-		} else if (CatActivityEnum.OnCatnip == activity.current) {
+		} 
+		else if (CatActivityEnum.OnCatnip == activity.current) 
+		{
 			stats.Fun += dt * fun_increase_when_on_catnip_per_second;
-		} else {
+		} 
+		else 
+{
 			stats.Fun -= dt * fun_decrease_per_second;
 		}
 
 		// Update hygiene
-		if (CatActivityEnum.BeingBrushed == activity.current) {
+		if (CatActivityEnum.BeingBrushed == activity.current) 
+		{
 			stats.Hygiene += dt * hygiene_increase_when_being_brushed_per_second;
-		} else {
-			stats.Hygiene -= dt * hygiene_decrease_per_second;
+		} 
+		else 
+		{
+			// If cat is using the litterbox, its hygiene stat decays twice as fast
+			if (CatActivityEnum.UsingLitterbox == activity.current)
+			{
+				stats.Hygiene -= dt * 2 * hygiene_decrease_per_second;
+			}
+			else
+			{
+				stats.Hygiene -= dt * hygiene_decrease_per_second;
+			}
+		}
+		
+		// Update bladder
+		if (CatActivityEnum.UsingLitterbox == activity.current) 
+		{
+			stats.Bladder += dt * bladder_increase_when_using_litter_box_per_second;
+		}
+		else
+		{	// If cat is eating, its bladder stat decays twice as fast
+			if (CatActivityEnum.Eating == activity.current)
+			{
+				stats.Bladder -= dt * 2 * bladder_decrease_per_second;
+			}
+			else 
+			{
+				stats.Bladder -= dt * bladder_decrease_per_second;
+			}
 		}
 	}
 	
