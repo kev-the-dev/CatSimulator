@@ -9,6 +9,8 @@ public class BaseCat : MonoBehaviour
 	public CatPersonality personality;
 	// The cat's style (color, fur)
 	public CatStyle style;
+	// Tracks achievments
+	public CatAchievements achievements;
 	
 	void Start()
 	{
@@ -24,6 +26,8 @@ public class BaseCat : MonoBehaviour
 		personality = CatPersonality.RandomPersonality();
 		// Initialize the style to random color
 		style = CatStyle.RandomStyle();
+		// Initialize no achievements
+		achievements = new CatAchievements(0, 0);
 	}
 	// Load the cat from a previous save
 	public void Load()
@@ -32,6 +36,7 @@ public class BaseCat : MonoBehaviour
 		personality = CatPersonality.Load();
 		stats = CatStats.Load();
 		style = CatStyle.Load();
+		achievements = CatAchievements.Load();
 
 		// Load cat pose
 		Quaternion r = new Quaternion(PlayerPrefs.GetFloat("pose.r.x"),
@@ -58,6 +63,7 @@ public class BaseCat : MonoBehaviour
 		personality.Save();
 		stats.Save();
 		style.Save();
+		achievements.Save();
 
 		// Save pose
 		PlayerPrefs.SetFloat("pose.p.x",gameObject.transform.position.x);

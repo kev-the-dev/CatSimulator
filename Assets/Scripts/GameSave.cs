@@ -5,7 +5,7 @@ public class GameSave
 {
 	// Versioning for the scripting so load/saves across different versions do not create issues
 	// NOTE: MUST be incremented each time the script changes in a way that changes save/load functionality
-	private const int ScriptMajorVersion = 2;
+	private const int ScriptMajorVersion = 3;
 
 	// True if there is a valid game save on disk
 	public static bool Valid()

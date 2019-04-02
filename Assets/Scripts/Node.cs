@@ -40,10 +40,10 @@ public class Context
 		stats = _stats;
 		activity = _activity;
 		
-		Debug.Log("In Context constructor: ");
-		Debug.Log(personality);
-		Debug.Log(stats);
-		Debug.Log(activity);
-		Debug.Log("Exiting Context constructor.");
+		//Debug.Log("In Context constructor: ");
+		//Debug.Log(personality);
+		//Debug.Log(stats);
+		//Debug.Log(activity);
+		//Debug.Log("Exiting Context constructor.");
 	}
 }
