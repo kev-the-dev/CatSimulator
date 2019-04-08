@@ -38,6 +38,42 @@ public class CustomCheckNode : PrimitiveNode
 	}
 }
 
+public class CheckTimerNode : PrimitiveNode
+{
+	public delegate void TimesUpFunction();
+	TimesUpFunction endTimerFunction;
+	
+	bool firstIteration;
+	float startTime;
+	float timerDuration;
+	
+	public CheckTimerNode (Context _context, float _duration, TimesUpFunction _function) : base (_context)
+	{
+		firstIteration = true;
+		timerDuration = _duration;
+		endTimerFunction = _function;
+	}
+	
+	public override NodeStatus run (float _time)
+	{	
+		// If node is being run for the first time, start the timer
+		if (firstIteration)
+		{
+			firstIteration = false;
+			startTime = _time;
+		}
+		
+		if (_time >= startTime + timerDuration)
+		{
+			endTimerFunction();
+			
+			return NodeStatus.Failure;
+		}
+		
+		return NodeStatus.Success;
+	}
+}
+
 
 // Decorators
 public class LoopNode : Node

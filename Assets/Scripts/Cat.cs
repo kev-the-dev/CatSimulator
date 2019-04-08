@@ -33,6 +33,9 @@ public class Cat : BaseCat
 	double drag_start_time;
 	public float time_of_last_user_interaction {get; private set;}
 	
+	// Can the cat currently use catnip? (if it is currently on catnip, using more will not do anything in order to prevent catnip buffs from stacking)
+	public bool on_catnip {get; private set;}
+	
 	// UI Buttons
 	private Button hand_button, brush_button, food_button, laser_button, litter_button;
 	public SelectedTool selected_tool {get; private set;}
@@ -64,6 +67,8 @@ public class Cat : BaseCat
 		laserPointerScript = laserPointer.GetComponent<LaserPointer>();
 		// Deactivate laser pointer game object to turn it off
 		laserPointer.SetActive(false);
+		// Cat is not on catnip
+		on_catnip = false;
 		
 		// Get Buttons
 		hand_button = GameObject.Find("hand_button").GetComponent<Button>();
@@ -173,7 +178,7 @@ public class Cat : BaseCat
 		// Update UI
 		stats.UpdateUI();
 
-		// Run behavior tree
+		// Run behavior tree. If a tree is "paused", it will not run.
 		autonomousCatBehaviorTree.run(Time.time);
 		userInteractionBehaviorTree.run(Time.time);
 		
@@ -276,6 +281,44 @@ public class Cat : BaseCat
 
 
  	}
+	
+	public IEnumerator useCatnip()
+    {
+        // Before Wait period:
+		Debug.Log("Using Catnip...");
+		activity.current = CatActivityEnum.OnCatnip;
+		on_catnip = true;
+		// Apply stat buffs
+		personality.fun_buff.Value *= CatPersonality.CATNIP_FUN_BUFF;
+		personality.fun_debuff.Value = CatPersonality.CATNIP_FUN_DEBUFF;
+		personality.energy_debuff.Value *= CatPersonality.CATNIP_ENERGY_DEBUFF;
+		agent.speed *= CatPersonality.CATNIP_SPEED_BOOST;
+		
+		
+        yield return new WaitForSeconds(CatnipScript.CATNIP_TIME_DURATION);
+        
+
+		// After Wait period:
+		Debug.Log("Catnip effects have worn off.");
+		activity.current = CatActivityEnum.Idle;
+		on_catnip = false;
+		// Remove stat buffs
+		personality.fun_buff.Value /= CatPersonality.CATNIP_FUN_BUFF;
+		personality.fun_debuff.Value += CatPersonality.DEFAULT_BUFF_VALUE;
+		personality.energy_debuff.Value /= CatPersonality.CATNIP_ENERGY_DEBUFF;
+		agent.speed /= CatPersonality.CATNIP_SPEED_BOOST;
+		
+    }
+	
+	public void resetActivity()
+	{
+		activity.current = CatActivityEnum.Idle;
+	}
+	
+	public CatActivityEnum getCurrentActivity()
+	{
+		return activity.current;
+	}
 
  	// Pause one behavior tree and activate the other
 	public void turnOnAutonomousCatBehavior()
