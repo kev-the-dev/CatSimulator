@@ -150,6 +150,7 @@ public class CatPersonality
 	public const float CATNIP_FUN_BUFF = 1.5F; // Multiply this to fun_buff when cat is on catnip
 	public const float CATNIP_FUN_DEBUFF = 0F; // Set fun_debuff to this value when cat is on catnip
 	public const float CATNIP_ENERGY_DEBUFF = 0.5F; // Multiply this to energy_buff when cat is on catnip
+	public const float CATNIP_SPEED_BOOST = 3F;
 	
 	public Buff energy_buff;
 	public Buff energy_debuff;

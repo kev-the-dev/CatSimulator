@@ -292,6 +292,7 @@ public class Cat : BaseCat
 		personality.fun_buff.Value *= CatPersonality.CATNIP_FUN_BUFF;
 		personality.fun_debuff.Value = CatPersonality.CATNIP_FUN_DEBUFF;
 		personality.energy_debuff.Value *= CatPersonality.CATNIP_ENERGY_DEBUFF;
+		agent.speed *= CatPersonality.CATNIP_SPEED_BOOST;
 		
 		
         yield return new WaitForSeconds(CatnipScript.CATNIP_TIME_DURATION);
@@ -305,6 +306,7 @@ public class Cat : BaseCat
 		personality.fun_buff.Value /= CatPersonality.CATNIP_FUN_BUFF;
 		personality.fun_debuff.Value += CatPersonality.DEFAULT_BUFF_VALUE;
 		personality.energy_debuff.Value /= CatPersonality.CATNIP_ENERGY_DEBUFF;
+		agent.speed /= CatPersonality.CATNIP_SPEED_BOOST;
 		
     }
 	
