@@ -289,10 +289,10 @@ public class Cat : BaseCat
 		activity.current = CatActivityEnum.OnCatnip;
 		on_catnip = true;
 		// Apply stat buffs
-		stats.fun_buff.Value *= CatStats.CATNIP_FUN_BUFF;
-		stats.fun_debuff.Value = CatStats.CATNIP_FUN_DEBUFF;
-		stats.energy_debuff.Value *= CatStats.CATNIP_ENERGY_DEBUFF;
-		agent.speed *= CatStats.CATNIP_SPEED_BOOST;
+		stats.fun_buff.Value = stats.fun_buff.Value * CatStats.CATNIP_FUN_BUFF;
+		stats.fun_debuff.Value = stats.fun_debuff.Value * CatStats.CATNIP_FUN_DEBUFF;
+		stats.energy_debuff.Value = stats.energy_debuff.Value * CatStats.CATNIP_ENERGY_DEBUFF;
+		agent.speed = agent.speed * CatStats.CATNIP_SPEED_BOOST;
 		
 		
         yield return new WaitForSeconds(CatnipScript.CATNIP_TIME_DURATION);
@@ -303,10 +303,10 @@ public class Cat : BaseCat
 		activity.current = CatActivityEnum.Idle;
 		on_catnip = false;
 		// Remove stat buffs
-		stats.fun_buff.Value /= CatStats.CATNIP_FUN_BUFF;
-		stats.fun_debuff.Value += CatStats.DEFAULT_BUFF_VALUE;
-		stats.energy_debuff.Value /= CatStats.CATNIP_ENERGY_DEBUFF;
-		agent.speed /= CatStats.CATNIP_SPEED_BOOST;
+		stats.fun_buff.Value = stats.fun_buff.Value / CatStats.CATNIP_FUN_BUFF;
+		stats.fun_debuff.Value = CatStats.DEFAULT_BUFF_VALUE;
+		stats.energy_debuff.Value = stats.energy_debuff.Value / CatStats.CATNIP_ENERGY_DEBUFF;
+		agent.speed = agent.speed / CatStats.CATNIP_SPEED_BOOST;
 		
     }
 	

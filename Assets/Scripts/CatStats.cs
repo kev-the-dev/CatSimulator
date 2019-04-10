@@ -14,18 +14,43 @@ public class CatStats
 		this.bladder = bladder;
 		this.bond = bond;
 		
-		this.energy_buff = new Buff();
-		this.energy_debuff = new Buff();
-		this.fullness_buff = new Buff();
-		this.fullness_debuff = new Buff();
-		this.fun_buff = new Buff();
-		this.fun_debuff = new Buff();
-		this.hygiene_buff = new Buff();
-		this.hygiene_debuff = new Buff();
-		this.bladder_buff = new Buff();
-		this.bladder_debuff = new Buff();
-		this.bond_buff = new Buff();
-		this.bond_debuff = new Buff();
+		Debug.Log("Initializing energy_buff...");
+		this.energy_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("EnergySliderGreenEffect"), GameObject.Find("EnergySliderYellowEffect"));
+		
+		Debug.Log("Initializing energy_debuff...");
+		this.energy_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("EnergySliderGreenEffect"), GameObject.Find("EnergySliderYellowEffect"));
+		
+		Debug.Log("Initializing fullness_buff...");
+		this.fullness_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("FoodSliderGreenEffect"), GameObject.Find("FoodSliderYellowEffect"));
+		
+		Debug.Log("Initializing fullness_debuff...");
+		this.fullness_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("FoodSliderGreenEffect"), GameObject.Find("FoodSliderYellowEffect"));
+		
+		Debug.Log("Initializing fun_buff...");
+		this.fun_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("FunSliderGreenEffect"), GameObject.Find("FunSliderYellowEffect"));
+		
+		Debug.Log("Initializing fun_debuff...");
+		this.fun_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("FunSliderGreenEffect"), GameObject.Find("FunSliderYellowEffect"));
+		
+		Debug.Log("Initializing hygiene_buff...");
+		this.hygiene_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("HygieneSliderGreenEffect"), GameObject.Find("HygieneSliderYellowEffect"));
+		
+		Debug.Log("Initializing hygiene_debuff...");
+		this.hygiene_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("HygieneSliderGreenEffect"), GameObject.Find("HygieneSliderYellowEffect"));
+		
+		Debug.Log("Initializing bladder_buff...");
+		this.bladder_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("BladderSliderGreenEffect"), GameObject.Find("BladderSliderYellowEffect"));
+		
+		Debug.Log("Initializing bladder_debuff...");
+		this.bladder_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("BladderSliderGreenEffect"), GameObject.Find("BladderSliderYellowEffect"));
+		
+		Debug.Log("Initializing bond_buff...");
+		this.bond_buff = new Buff(true, DEFAULT_BUFF_VALUE);
+		
+		Debug.Log("Initializing bond_debuff...");
+		this.bond_debuff = new Buff(false, DEFAULT_BUFF_VALUE);
+		
+		updateAllStatBuffVisualEffects();
 
 		if (AdoptionCenter.IsActive()) {
 			return;
@@ -127,6 +152,27 @@ public class CatStats
 		this.bond_buff.Value = DEFAULT_BUFF_VALUE;
 		this.bond_debuff.Value = DEFAULT_BUFF_VALUE;
 	}
+	
+	public void updateAllStatBuffVisualEffects()
+	{
+		this.energy_buff.updateVisualEffects();
+		this.energy_debuff.updateVisualEffects();
+		this.fullness_buff.updateVisualEffects();
+		this.fullness_debuff.updateVisualEffects();
+		this.fun_buff.updateVisualEffects();
+		this.fun_debuff.updateVisualEffects();
+		this.hygiene_buff.updateVisualEffects();
+		this.hygiene_debuff.updateVisualEffects();
+		this.bladder_buff.updateVisualEffects();
+		this.bladder_debuff.updateVisualEffects();
+		this.bond_buff.updateVisualEffects();
+		this.bond_debuff.updateVisualEffects();
+	}
+	
+	private void checkStatBuffs()
+	{
+		
+	}
 
 	// Update the stat bars with the current stats
 	public void UpdateUI()
@@ -146,6 +192,8 @@ public class CatStats
 		} else {
 			this.happy_indicator.enabled = false;
 		}
+		
+		
 	}
 
 	public override string ToString()
@@ -192,24 +240,30 @@ public class Buff
 			A debuff value of > 1 means the stat decreases faster than normal.
 	*/
 	
+	private bool isBuff; // Is this a stat buff or debuff?
+	
+	// Visual effect references
+	private GameObject greenEffect;
+	private GameObject yellowEffect;
+	
+	// Stat buff numerical value
 	private float _value;
 	public float Value
 	{
 		get {return _value;} 
 		set 
 		{
-			if (value < 0)
-			{
+			if (value < 0) {
 				_value = 0;
 			}
-			else
-			{
+			else {
 				_value = value;
 			}
+			updateVisualEffects();
 		}
 	}
 	
-	public Buff ( float _buff_value = CatStats.DEFAULT_BUFF_VALUE)
+	public Buff ( bool _isBuff, float _buff_value, GameObject _green_effect = null, GameObject _yellow_effect = null)
 	{
 		if (_buff_value < 0)
 		{
@@ -220,6 +274,62 @@ public class Buff
 			_value = _buff_value;
 		}
 		
+		isBuff = _isBuff;
+		
+		greenEffect = _green_effect;
+		yellowEffect = _yellow_effect;
+		
+		if (!_green_effect || !_yellow_effect)
+		{
+			Debug.Log("Visual effects missing for buff/debuff.");
+		}
+		
+	}
+	
+	// Turn visual effects on/off if needed
+	public void updateVisualEffects()
+	{
+		if (isBuff)
+		{
+			if (_value == CatStats.DEFAULT_BUFF_VALUE)
+			{
+				if (greenEffect) {greenEffect.SetActive(false);}
+				if (yellowEffect) {yellowEffect.SetActive(false);}
+			}
+			// If stats are increasing slower than usual (bad)...
+			else if (_value < CatStats.DEFAULT_BUFF_VALUE) 
+			{
+				if (greenEffect) {greenEffect.SetActive(false);}
+				if (yellowEffect) {yellowEffect.SetActive(true);}
+			}
+			// If stats are increasing faster than usual (good)...
+			else if (_value > CatStats.DEFAULT_BUFF_VALUE)
+			{
+				if (greenEffect) {greenEffect.SetActive(true);}
+				if (yellowEffect) {yellowEffect.SetActive(false);}
+			}
+		}
+		else
+		{
+			if (_value == CatStats.DEFAULT_BUFF_VALUE)
+			{
+				if (greenEffect) {greenEffect.SetActive(false);}
+				if (yellowEffect) {yellowEffect.SetActive(false);}
+			}
+			// If stats are decreasing slower than usual (good)...
+			else if (_value < CatStats.DEFAULT_BUFF_VALUE)
+			{
+				if (greenEffect) {greenEffect.SetActive(true);}
+				if (yellowEffect) {yellowEffect.SetActive(false);}
+			}
+			// If stats are decreasing faster than usual (bad)...
+			else if (_value > CatStats.DEFAULT_BUFF_VALUE)
+			{
+				if (greenEffect) {greenEffect.SetActive(false);}
+				if (yellowEffect) {yellowEffect.SetActive(true);}
+			}
+		}
 	}
 	
 }
+
