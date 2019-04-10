@@ -165,10 +165,12 @@ public class CatPersonality
 			// If cat is using the litterbox, its hygiene stat decays twice as fast
 			if (CatActivityEnum.UsingLitterbox == activity.current)
 			{
-				stats.Hygiene -= dt * 2 * hygiene_decrease_per_second * stats.hygiene_debuff.Value;
+				stats.hygiene_debuff.Value = 2;
+				stats.Hygiene -= dt * hygiene_decrease_per_second * stats.hygiene_debuff.Value;
 			}
 			else
 			{
+				stats.hygiene_debuff.Value = CatStats.DEFAULT_BUFF_VALUE;
 				stats.Hygiene -= dt * hygiene_decrease_per_second * stats.hygiene_debuff.Value;
 			}
 		}
@@ -182,10 +184,12 @@ public class CatPersonality
 		{	// If cat is eating, its bladder stat decays twice as fast
 			if (CatActivityEnum.Eating == activity.current)
 			{
-				stats.Bladder -= dt * 2 * bladder_decrease_per_second * stats.bladder_debuff.Value;
+				stats.bladder_debuff.Value = 2;
+				stats.Bladder -= dt * bladder_decrease_per_second * stats.bladder_debuff.Value;
 			}
 			else 
 			{
+				stats.bladder_debuff.Value = CatStats.DEFAULT_BUFF_VALUE;
 				stats.Bladder -= dt * bladder_decrease_per_second * stats.bladder_debuff.Value;
 			}
 		}
