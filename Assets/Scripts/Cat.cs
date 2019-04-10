@@ -21,6 +21,9 @@ public class Cat : BaseCat
 	CatActivity activity;
 	
 	NavMeshAgent agent;
+	Animator animator;
+	bool forced_walk;
+	bool forced_sit;
 	
 	// Cat AI
 	BehaviorTree autonomousCatBehaviorTree;
@@ -57,6 +60,10 @@ public class Cat : BaseCat
     {
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
+		// Initialize animator
+		animator = GameObject.Find("Cat_Model_Latest").GetComponent<Animator>();
+		forced_walk = false;
+		forced_sit = false;
 		
 		// Cat position for petting / brushing
 		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
@@ -153,6 +160,27 @@ public class Cat : BaseCat
     // Update is called once per frame
     void Update()
     {
+		// Set walking / sitting animiation
+		float velocity = agent.velocity.magnitude;
+		if (velocity < 0.2) {
+			animator.SetBool("moving", false);
+			forced_walk = false;
+			if (!forced_sit && animator.GetCurrentAnimatorStateInfo(0).IsName("Walk")) {
+				animator.SetFloat("speed", 1.0F);
+				animator.Play("Walk", -1, 0.9F);
+				forced_sit = true;
+			}
+		} else {
+			forced_sit = false;
+			animator.SetBool("moving", true);
+			if (!forced_walk && animator.GetCurrentAnimatorStateInfo(0).IsName("Idle")) {
+				animator.Play("Idle", -1, 0.8F);
+				forced_walk = true;
+			}
+			animator.SetFloat("speed", velocity);
+		}
+
+		// Update achievements
 		achievements.GetNewUnlocks();
 
 		// TODO: autosave
@@ -170,6 +198,7 @@ public class Cat : BaseCat
 
 		// Calcuate time delta since last update, in seconds, fps-independent calculations
 		float dt = Time.time - last_update_time;
+		achievements.time_played += dt;
 		last_update_time = Time.time;
 
 		// Update cat stats with current state
@@ -191,7 +220,7 @@ public class Cat : BaseCat
 		// Log current state
 		//Debug.Log(activity);
         //Debug.Log(stats);
-		//Debug.Log(achievements);
+		Debug.Log(achievements);
     }
 
 	// Change the currently selected tool
