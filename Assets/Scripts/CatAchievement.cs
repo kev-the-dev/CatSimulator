@@ -35,3 +35,12 @@ public class BrushAchievement : CatAchievement
 	public override bool Unlocked(CatAchievements achievements) { return achievements.num_brushes >= threshold;}
 	private int threshold;
 }
+
+public class MinutesPlayedAchievement : CatAchievement
+{
+	public MinutesPlayedAchievement(int threshold) : base(string.Format("Played for {0} minutes(s)", threshold)) {
+		this.threshold = threshold;
+	}
+	public override bool Unlocked(CatAchievements achievements) { return (achievements.time_played / 60F) >= threshold;}
+	private int threshold;
+}

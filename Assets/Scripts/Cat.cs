@@ -180,7 +180,7 @@ public class Cat : BaseCat
 			animator.SetFloat("speed", velocity);
 		}
 
-		// 
+		// Update achievements
 		achievements.GetNewUnlocks();
 
 		// TODO: autosave
@@ -198,6 +198,7 @@ public class Cat : BaseCat
 
 		// Calcuate time delta since last update, in seconds, fps-independent calculations
 		float dt = Time.time - last_update_time;
+		achievements.time_played += dt;
 		last_update_time = Time.time;
 
 		// Update cat stats with current state
@@ -219,7 +220,7 @@ public class Cat : BaseCat
 		// Log current state
 		//Debug.Log(activity);
         //Debug.Log(stats);
-		//Debug.Log(achievements);
+		Debug.Log(achievements);
     }
 
 	// Change the currently selected tool

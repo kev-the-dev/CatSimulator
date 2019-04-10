@@ -27,7 +27,7 @@ public class BaseCat : MonoBehaviour
 		// Initialize the style to random color
 		style = CatStyle.RandomStyle();
 		// Initialize no achievements
-		achievements = new CatAchievements(0, 0);
+		achievements = new CatAchievements();
 	}
 	// Load the cat from a previous save
 	public void Load()
