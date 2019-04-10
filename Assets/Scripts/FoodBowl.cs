@@ -13,12 +13,6 @@ public class FoodBowl : MonoBehaviour
         kibble = GameObject.Find("food_in_bowl");
 		catScript = GameObject.Find("Cat").GetComponent<Cat>();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 	
 	void OnMouseDown()
 	{
