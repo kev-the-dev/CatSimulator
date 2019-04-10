@@ -44,3 +44,13 @@ public class MinutesPlayedAchievement : CatAchievement
 	public override bool Unlocked(CatAchievements achievements) { return (achievements.time_played / 60F) >= threshold;}
 	private int threshold;
 }
+
+public class LitterBoxCleanedAchievement : CatAchievement
+{
+	public LitterBoxCleanedAchievement(int threshold) : base(string.Format("Litter box cleaned {0} times", threshold)) {
+		this.threshold = threshold;
+	}
+	public override bool Unlocked(CatAchievements achievements) { return achievements.litter_box_cleaned >= threshold;}
+	private int threshold;
+}
+

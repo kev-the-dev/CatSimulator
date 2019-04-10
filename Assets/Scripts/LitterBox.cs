@@ -39,6 +39,7 @@ public class LitterBox : MonoBehaviour
 			{
 				if (poop.activeSelf == true)
 				{
+					catScript.achievements.litter_box_cleaned += 1;
 					poop.SetActive(false);
 					return;
 				}
