@@ -4,39 +4,25 @@ using UnityEngine;
 
 public class RecordPlayer : MonoBehaviour
 {
-    //Script for cilcking on record player and loading a popup screen for changing audio track
-    //Add to Gameobject recordPlayer
+    //Script for cilcking on record player to pause/play backgroundMusic
 
-    public GameObject recordPlayerScreen;
+    public AudioSource backgroundMusic;
  
                           
     void Start()
     {
-
+		backgroundMusic = GameObject.Find("BackgroundMusic").GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
-    private void OnMouseOver()
+    public void OnMouseUp()
     {
-
-        if (Input.GetMouseButtonDown(0))
+		Debug.Log("TOGGLE");
+        if (!backgroundMusic.isPlaying)
         {
-            Debug.Log("Pressed left click.");
-            recordPlayerScreen.SetActive(true);
-        
-        }
-
-
+           backgroundMusic.Play();
+        } else {
+			backgroundMusic.Stop();
+		}
     }
-
-    public void Update()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-           recordPlayerScreen.SetActive(false);
-        }
-
-    }
-
-
 }
