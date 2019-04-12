@@ -26,6 +26,9 @@ public class Cat : BaseCat
 	BehaviorTree autonomousCatBehaviorTree;
 	BehaviorTree userInteractionBehaviorTree;
 	Context contextObject;
+	// Coroutine variable
+	private bool waiting;
+	public const float BT_TRAVERSAL_INTERVAL = 1F;	// Traverse the tree every second
 	
 	// Petting / brushing / summoning related variables
 	Vector3 inFrontOfUserPosition;
@@ -179,8 +182,7 @@ public class Cat : BaseCat
 		stats.UpdateUI();
 
 		// Run behavior tree. If a tree is "paused", it will not run.
-		autonomousCatBehaviorTree.run(Time.time);
-		userInteractionBehaviorTree.run(Time.time);
+		StartCoroutine(runTree(Time.time));
 		
 		// If cat is currently interacting with user, the camera should follow the cat
 		if (userInteractionBehaviorTree.paused == false)
@@ -193,6 +195,29 @@ public class Cat : BaseCat
         //Debug.Log(stats);
 		//Debug.Log(achievements);
     }
+	
+	// Coroutine to run BT once every set interval
+	IEnumerator runTree(float _startTime)
+	{	
+		// Do not execute coroutine if it is already running
+		if (waiting)
+		{
+			yield break;
+		}
+		
+		// Begin waiting
+		waiting = true;
+		
+		// Traverse behavior trees
+		Debug.Log(string.Format("Running trees... Time = {0}", _startTime));
+		autonomousCatBehaviorTree.run(_startTime);
+		userInteractionBehaviorTree.run(_startTime);
+		Debug.Log(string.Format("Finished running trees... Time = {0}", Time.time));
+		
+		yield return new WaitForSeconds(BT_TRAVERSAL_INTERVAL);
+		
+		waiting = false;
+	}
 
 	// Change the currently selected tool
 	void SelectTool(SelectedTool tool)

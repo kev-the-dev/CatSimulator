@@ -13,18 +13,22 @@ public class BehaviorTree
 	public BehaviorTree (Node _root)
 	{
 		root = _root;
+		paused = false;
 	}
 	
-	public void run (float _startTime)
+	public void run(float _startTime)
 	{
+		// Do not run if tree is paused
 		if (!paused)
 		{
-			// TODO: implement stack-based iterative preorder traversal
+			// Traverse tree
 			status = root.run(_startTime);
 		}
 	}
 	
 }
+
+
 
 // Possible return statuses of behavior tree nodes
 public enum NodeStatus
