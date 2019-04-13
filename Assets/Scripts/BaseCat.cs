@@ -19,7 +19,7 @@ public class BaseCat : MonoBehaviour
 
 	// Called when there is no save to generate a new random cat
 	public void CreateNew()
-	{
+	{		
 		// Initialize stats for a completely content cat
 		stats = new CatStats();
 		// Initialize personality to random values

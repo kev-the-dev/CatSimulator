@@ -29,6 +29,9 @@ public class Cat : BaseCat
 	BehaviorTree autonomousCatBehaviorTree;
 	BehaviorTree userInteractionBehaviorTree;
 	Context contextObject;
+	// Coroutine variable
+	private bool waiting;
+	public const float BT_TRAVERSAL_INTERVAL = 1F;	// Traverse the tree every second
 	
 	// Petting / brushing / summoning related variables
 	Vector3 inFrontOfUserPosition;
@@ -208,8 +211,7 @@ public class Cat : BaseCat
 		stats.UpdateUI();
 
 		// Run behavior tree. If a tree is "paused", it will not run.
-		autonomousCatBehaviorTree.run(Time.time);
-		userInteractionBehaviorTree.run(Time.time);
+		StartCoroutine(runTree(Time.time));
 		
 		// If cat is currently interacting with user, the camera should follow the cat
 		if (userInteractionBehaviorTree.paused == false)
@@ -222,6 +224,29 @@ public class Cat : BaseCat
         //Debug.Log(stats);
 		Debug.Log(achievements);
     }
+	
+	// Coroutine to run BT once every set interval
+	IEnumerator runTree(float _startTime)
+	{	
+		// Do not execute coroutine if it is already running
+		if (waiting)
+		{
+			yield break;
+		}
+		
+		// Begin waiting
+		waiting = true;
+		
+		// Traverse behavior trees
+		Debug.Log(string.Format("Running trees... Time = {0}", _startTime));
+		autonomousCatBehaviorTree.run(_startTime);
+		userInteractionBehaviorTree.run(_startTime);
+		Debug.Log(string.Format("Finished running trees... Time = {0}", Time.time));
+		
+		yield return new WaitForSeconds(BT_TRAVERSAL_INTERVAL);
+		
+		waiting = false;
+	}
 
 	// Change the currently selected tool
 	void SelectTool(SelectedTool tool)
@@ -318,10 +343,10 @@ public class Cat : BaseCat
 		activity.current = CatActivityEnum.OnCatnip;
 		on_catnip = true;
 		// Apply stat buffs
-		personality.fun_buff.Value *= CatPersonality.CATNIP_FUN_BUFF;
-		personality.fun_debuff.Value = CatPersonality.CATNIP_FUN_DEBUFF;
-		personality.energy_debuff.Value *= CatPersonality.CATNIP_ENERGY_DEBUFF;
-		agent.speed *= CatPersonality.CATNIP_SPEED_BOOST;
+		stats.fun_buff.Value = stats.fun_buff.Value * CatStats.CATNIP_FUN_BUFF;
+		stats.fun_debuff.Value = stats.fun_debuff.Value * CatStats.CATNIP_FUN_DEBUFF;
+		stats.energy_debuff.Value = stats.energy_debuff.Value * CatStats.CATNIP_ENERGY_DEBUFF;
+		agent.speed = agent.speed * CatStats.CATNIP_SPEED_BOOST;
 		
 		
         yield return new WaitForSeconds(CatnipScript.CATNIP_TIME_DURATION);
@@ -332,10 +357,10 @@ public class Cat : BaseCat
 		activity.current = CatActivityEnum.Idle;
 		on_catnip = false;
 		// Remove stat buffs
-		personality.fun_buff.Value /= CatPersonality.CATNIP_FUN_BUFF;
-		personality.fun_debuff.Value += CatPersonality.DEFAULT_BUFF_VALUE;
-		personality.energy_debuff.Value /= CatPersonality.CATNIP_ENERGY_DEBUFF;
-		agent.speed /= CatPersonality.CATNIP_SPEED_BOOST;
+		stats.fun_buff.Value = stats.fun_buff.Value / CatStats.CATNIP_FUN_BUFF;
+		stats.fun_debuff.Value = CatStats.DEFAULT_BUFF_VALUE;
+		stats.energy_debuff.Value = stats.energy_debuff.Value / CatStats.CATNIP_ENERGY_DEBUFF;
+		agent.speed = agent.speed / CatStats.CATNIP_SPEED_BOOST;
 		
     }
 	
