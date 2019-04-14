@@ -12,6 +12,8 @@ public class BaseCat : MonoBehaviour
 	// Tracks achievments
 	public CatAchievements achievements;
 	
+	public System.Random rng;
+	
 	void Start()
 	{
 		CreateNew();

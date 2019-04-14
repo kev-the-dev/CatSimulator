@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class CatPersonality
 {
-	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F, float bladder_threshold = 0.2F)
+	public CatPersonality(float hungriness, float tierdness, float playfullness, float cleanlieness, float sociability, float sleep_threshold = 0.2F, float hunger_threshold = 0.25F, float bladder_threshold = 0.2F, float fun_threshold = 0.3F)
 	{
 		this.hungriness = hungriness;
 		this.tierdness = tierdness;
@@ -14,6 +14,7 @@ public class CatPersonality
 		this.sleep_threshold = sleep_threshold;
 		this.hunger_threshold = hunger_threshold;
 		this.bladder_threshold = bladder_threshold;
+		this.fun_threshold = fun_threshold;
 
 		// If in adoption mode, set card sliders
 		if (AdoptionCenter.IsActive()) {
@@ -89,6 +90,7 @@ public class CatPersonality
 	public float sleep_threshold {get; private set;}		// Cat falls asleep when energy reaches this level
 	public float hunger_threshold {get; private set;}		// Cat tries to eat when fullness reaches this level
 	public float bladder_threshold {get; private set;}		// Cat uses the litter box when bladder stat reaches this level
+	public float fun_threshold {get; private set;}			// Cat plays with toy when fun stat reaches this level
 	
 	public override string ToString()
 	{
@@ -138,7 +140,7 @@ public class CatPersonality
 		}
 
 		// Update fun
-		if (CatActivityEnum.PlayingWithYarn == activity.current) 
+		if (CatActivityEnum.Playing == activity.current) 
 		{
 			stats.Fun += dt * fun_increase_when_playing_with_yarn_per_second * stats.fun_buff.Value;
 		} 

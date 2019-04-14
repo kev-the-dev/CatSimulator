@@ -29,7 +29,7 @@ public class Cat : BaseCat
 	BehaviorTree autonomousCatBehaviorTree;
 	BehaviorTree userInteractionBehaviorTree;
 	Context contextObject;
-	// Coroutine variable
+	// Coroutine variables
 	private bool waiting;
 	public const float BT_TRAVERSAL_INTERVAL = 1F;	// Traverse the tree every second
 	
@@ -116,6 +116,8 @@ public class Cat : BaseCat
 		// Initialize variables needed by behavior tree nodes
 		contextObject = new Context( gameObject, ref personality, ref stats, ref activity );
 		getPointDelegate getPointDel = laserPointerScript.getLaserIntersectionPoint;
+		waiting = false;
+		rng = new System.Random();
 		
 		// Construct the cat's behavior tree
         autonomousCatBehaviorTree = new BehaviorTree(	new SelectorNode	( 	contextObject,
@@ -140,9 +142,23 @@ public class Cat : BaseCat
 																																			new GoToDynamicPointNode ( contextObject, getPointDel ),
 																																			new ChaseLaserNode ( contextObject )
 																																		),
+																				/* Chase Toy Ball Sequence */		new SequenceNode	(	contextObject,
+																																			new CheckFunNode (contextObject),
+																																			new CoinFlipNode (contextObject, rng, 15F),
+																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("Toy Ball") ),
+																																			new PlayNode ( contextObject ),
+																																			new GoToObjectNode ( contextObject, GameObject.Find("Toy Ball") )
+																																		),
+																				/* Chase Toy Mouse Sequence */		new SequenceNode	(	contextObject,
+																																			new CheckFunNode (contextObject),
+																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("Mouse")),
+																																			new PlayNode ( contextObject ),
+																																			new GoToObjectNode ( contextObject, GameObject.Find("Mouse") )
+																																		),
 																				/* Wandering Sequence */			new SequenceNode 	(	contextObject,
 																																			new WaitNode ( contextObject, 5F),
-																																			new GoToRandomPointNode ( contextObject )
+																																			new GoToRandomPointNode ( contextObject ),
+																																			new IdleNode ( contextObject )
 																																		)
 																			)
 													);
