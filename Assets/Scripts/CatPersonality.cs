@@ -42,6 +42,8 @@ public class CatPersonality
 		this.bladder_decrease_per_second = CalculateMultipier(0.01F, 0.02F, Random.Range(MIN, MAX));
 		this.bladder_increase_when_using_litter_box_per_second = CalculateMultipier(0.1F, 0.2F, Random.Range(MIN, MAX));
 		
+		agent = GameObject.Find("Cat").GetComponent<UnityEngine.AI.NavMeshAgent>();
+		
 	}
 
 	// Generates and returns a random cat personality
@@ -91,6 +93,9 @@ public class CatPersonality
 	public float hunger_threshold {get; private set;}		// Cat tries to eat when fullness reaches this level
 	public float bladder_threshold {get; private set;}		// Cat uses the litter box when bladder stat reaches this level
 	public float fun_threshold {get; private set;}			// Cat plays with toy when fun stat reaches this level
+	
+	// Reference to cat's nav mesh agent
+	UnityEngine.AI.NavMeshAgent agent;
 	
 	public override string ToString()
 	{
@@ -143,18 +148,22 @@ public class CatPersonality
 		if (CatActivityEnum.Playing == activity.current) 
 		{
 			stats.Fun += dt * fun_increase_when_playing_with_yarn_per_second * stats.fun_buff.Value;
+			agent.speed = 7F;
 		} 
 		else if (CatActivityEnum.FollowingLaser == activity.current) 
 		{
 			stats.Fun += dt * fun_increase_when_following_laser_per_second * stats.fun_buff.Value;
+			agent.speed = 7F;
 		} 
 		else if (CatActivityEnum.OnCatnip == activity.current) 
 		{
 			stats.Fun += dt * fun_increase_when_on_catnip_per_second * stats.fun_buff.Value;
+			agent.speed = 7F;
 		} 
 		else 
 		{
 			stats.Fun -= dt * fun_decrease_per_second * stats.fun_debuff.Value;
+			agent.speed = 3.5F;
 		}
 
 		// Update hygiene
