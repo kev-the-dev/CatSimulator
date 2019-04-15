@@ -12,6 +12,6 @@ public class StatBar : MonoBehaviour {
 	public void SetColor()
 	{
 		float hue = slider.value / 3F;
-		fill.color = Color.HSVToRGB(hue, 1F, 1F);
+		fill.color = Color.HSVToRGB(hue, 0.3F, 0.90F);
 	}
 }
