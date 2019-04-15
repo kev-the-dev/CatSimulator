@@ -29,17 +29,17 @@ public class CatPersonality
 		this.bond_increase_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_when_being_pet_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
 		this.bond_increase_per_happieness_per_second = CalculateMultipier(0.01F, 0.02F, this.sociability);
-		this.fullness_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.hungriness);
+		this.fullness_decrease_per_second = CalculateMultipier(0.008F, 0.015F, this.hungriness);
 		this.fullness_increase_when_eating_per_second = CalculateMultipier(0.05F, 0.1F, this.hungriness, true);
-		this.energy_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.tierdness);
+		this.energy_decrease_per_second = CalculateMultipier(0.006F, 0.01F, this.tierdness);
 		this.energy_increase_when_sleeping_per_second = CalculateMultipier(0.1F, 0.2F, this.tierdness, true);
-		this.fun_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.playfullness);
+		this.fun_decrease_per_second = CalculateMultipier(0.015F, 0.025F, this.playfullness);
 		this.fun_increase_when_following_laser_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.fun_increase_when_playing_with_yarn_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.fun_increase_when_on_catnip_per_second = CalculateMultipier(0.05F, 0.1F, this.playfullness);
 		this.hygiene_decrease_per_second = CalculateMultipier(0.01F, 0.02F, this.cleanlieness);
 		this.hygiene_increase_when_being_brushed_per_second = CalculateMultipier(0.1F, 0.2F, this.cleanlieness);
-		this.bladder_decrease_per_second = CalculateMultipier(0.01F, 0.02F, Random.Range(MIN, MAX));
+		this.bladder_decrease_per_second = CalculateMultipier(0.005F, 0.01F, Random.Range(MIN, MAX));
 		this.bladder_increase_when_using_litter_box_per_second = CalculateMultipier(0.1F, 0.2F, Random.Range(MIN, MAX));
 		
 		agent = GameObject.Find("Cat").GetComponent<UnityEngine.AI.NavMeshAgent>();

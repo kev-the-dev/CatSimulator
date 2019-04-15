@@ -14,6 +14,12 @@ public class CatStats
 		this.bladder = bladder;
 		this.bond = bond;
 		
+		
+
+		if (AdoptionCenter.IsActive()) {
+			return;
+		}
+
 		//Debug.Log("Initializing energy_buff...");
 		this.energy_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("EnergySliderGreenEffect"), GameObject.Find("EnergySliderYellowEffect"));
 		
@@ -51,11 +57,7 @@ public class CatStats
 		this.bond_debuff = new Buff(false, DEFAULT_BUFF_VALUE);
 		
 		updateAllStatBuffVisualEffects();
-
-		if (AdoptionCenter.IsActive()) {
-			return;
-		}
-
+		
 		this.energy_slider = GameObject.Find("energy_slider").GetComponent <Slider> ();
 		this.fullness_slider = GameObject.Find("food_slider").GetComponent <Slider> ();
 		this.hygiene_slider = GameObject.Find("hygiene_slider").GetComponent <Slider> ();
