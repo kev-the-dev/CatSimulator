@@ -14,40 +14,40 @@ public class CatStats
 		this.bladder = bladder;
 		this.bond = bond;
 		
-		Debug.Log("Initializing energy_buff...");
+		//Debug.Log("Initializing energy_buff...");
 		this.energy_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("EnergySliderGreenEffect"), GameObject.Find("EnergySliderYellowEffect"));
 		
-		Debug.Log("Initializing energy_debuff...");
+		//Debug.Log("Initializing energy_debuff...");
 		this.energy_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("EnergySliderGreenEffect"), GameObject.Find("EnergySliderYellowEffect"));
 		
-		Debug.Log("Initializing fullness_buff...");
+		//Debug.Log("Initializing fullness_buff...");
 		this.fullness_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("FoodSliderGreenEffect"), GameObject.Find("FoodSliderYellowEffect"));
 		
-		Debug.Log("Initializing fullness_debuff...");
+		//Debug.Log("Initializing fullness_debuff...");
 		this.fullness_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("FoodSliderGreenEffect"), GameObject.Find("FoodSliderYellowEffect"));
 		
-		Debug.Log("Initializing fun_buff...");
+		//Debug.Log("Initializing fun_buff...");
 		this.fun_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("FunSliderGreenEffect"), GameObject.Find("FunSliderYellowEffect"));
 		
-		Debug.Log("Initializing fun_debuff...");
+		//Debug.Log("Initializing fun_debuff...");
 		this.fun_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("FunSliderGreenEffect"), GameObject.Find("FunSliderYellowEffect"));
 		
-		Debug.Log("Initializing hygiene_buff...");
+		//Debug.Log("Initializing hygiene_buff...");
 		this.hygiene_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("HygieneSliderGreenEffect"), GameObject.Find("HygieneSliderYellowEffect"));
 		
-		Debug.Log("Initializing hygiene_debuff...");
+		//Debug.Log("Initializing hygiene_debuff...");
 		this.hygiene_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("HygieneSliderGreenEffect"), GameObject.Find("HygieneSliderYellowEffect"));
 		
-		Debug.Log("Initializing bladder_buff...");
+		//Debug.Log("Initializing bladder_buff...");
 		this.bladder_buff = new Buff (true, DEFAULT_BUFF_VALUE, GameObject.Find("BladderSliderGreenEffect"), GameObject.Find("BladderSliderYellowEffect"));
 		
-		Debug.Log("Initializing bladder_debuff...");
+		//Debug.Log("Initializing bladder_debuff...");
 		this.bladder_debuff = new Buff (false, DEFAULT_BUFF_VALUE, GameObject.Find("BladderSliderGreenEffect"), GameObject.Find("BladderSliderYellowEffect"));
 		
-		Debug.Log("Initializing bond_buff...");
+		//Debug.Log("Initializing bond_buff...");
 		this.bond_buff = new Buff(true, DEFAULT_BUFF_VALUE);
 		
-		Debug.Log("Initializing bond_debuff...");
+		//Debug.Log("Initializing bond_debuff...");
 		this.bond_debuff = new Buff(false, DEFAULT_BUFF_VALUE);
 		
 		updateAllStatBuffVisualEffects();

@@ -409,6 +409,34 @@ public class FocusOnUserNode : PrimitiveNode
 	}
 }
 
+public class PlayNode : PrimitiveNode
+{
+	public PlayNode (Context _context) : base (_context)
+	{
+		
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		contextObj.activity.current = CatActivityEnum.Playing;
+		return NodeStatus.Success;
+	}
+}
+
+public class IdleNode : PrimitiveNode
+{
+	public IdleNode (Context _context) : base (_context)
+	{
+		
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		contextObj.activity.current = CatActivityEnum.Idle;
+		return NodeStatus.Success;
+	}
+}
+
 public class ChaseLaserNode : PrimitiveNode
 {
 	public ChaseLaserNode (Context _context) : base (_context)
@@ -518,6 +546,37 @@ public class CheckBladderNode : PrimitiveNode
 		return NodeStatus.Failure;
 	}
 	
+}
+
+public class CheckFunNode : PrimitiveNode
+{
+	float funThreshold;
+	
+	public CheckFunNode (Context _context) : base (_context)
+	{
+		funThreshold = contextObj.personality.fun_threshold;
+	}
+	
+	public CheckFunNode (Context _context, float _custom_fun_threshold) : base (_context)
+	{
+		funThreshold = _custom_fun_threshold;
+	}
+	
+	public override NodeStatus run ( float _time )
+	{
+		// if already playing
+		if (contextObj.activity.current == CatActivityEnum.Playing)
+		{
+			return NodeStatus.Success;
+		}
+		// If not already playing, but cat is bored, return Success
+		else if (contextObj.stats.Fun < funThreshold)
+		{
+			return NodeStatus.Success;
+		}
+		
+		return NodeStatus.Failure;
+	}	
 }
 
 public class CheckObjectStatusNode : PrimitiveNode

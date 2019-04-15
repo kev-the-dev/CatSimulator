@@ -22,7 +22,7 @@ public enum CatActivityEnum
 	BeingBrushed, 
 	BeingPet, 
 	FollowingLaser, 
-	PlayingWithYarn, 
+	Playing, 
 	UsingLitterbox,
 	OnCatnip
 }

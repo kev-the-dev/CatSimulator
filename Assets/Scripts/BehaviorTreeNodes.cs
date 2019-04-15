@@ -74,6 +74,44 @@ public class CheckTimerNode : PrimitiveNode
 	}
 }
 
+public class CoinFlipNode : PrimitiveNode
+{
+	System.Random rng;				// Random number generator. Ideally, there should only be one RNG object per program
+	int result;				// "coin flip" result. Will be either a 0 (Failure) or 1 (Success).
+	float waitTime;			// wait this many seconds before "flipping" the coin again
+	float lastCoinFlip;		// Time of last coin flip
+	
+	public CoinFlipNode (Context _context, System.Random _rng, float _waitTime = 0F) : base (_context)
+	{
+		rng = _rng;
+		result = rng.Next((int) 0, (int) 2);	// Returns a random integer between [0, 2). Effectively, returns a 0 or 1.
+		waitTime = _waitTime;
+		lastCoinFlip = 0;
+	}
+	
+	public override NodeStatus run (float _time)
+	{
+		if (lastCoinFlip + waitTime > _time)
+		{
+			result = rng.Next((int) 0, (int) 2);
+			lastCoinFlip = _time;
+		}
+		
+		if (result == 0)
+		{
+			return NodeStatus.Failure;
+		}
+		else if (result == 1)
+		{
+			return NodeStatus.Success;
+		}
+		
+		// what
+		return NodeStatus.Running;
+	}
+	
+	
+}
 
 // Decorators
 public class LoopNode : Node
