@@ -74,7 +74,7 @@ public class Cat : BaseCat
 		forced_sit = false;
 		
 		// Cat position for petting / brushing
-		inFrontOfUserPosition = new Vector3(0F, -0.5F, -5F);
+		inFrontOfUserPosition = new Vector3(0F, -0.5F, -6F);
 		
 		// Get the laser pointer GameObject
 		laserPointer = GameObject.Find("Laser Pointer");
@@ -149,12 +149,13 @@ public class Cat : BaseCat
 																																		),
 																				/* Chase Toy Ball Sequence */		new SequenceNode	(	contextObject,
 																																			new CheckFunNode (contextObject),
-																																			new CoinFlipNode (contextObject, rng, 30F),
+																																			new CoinFlipNode (contextObject, rng, 15F),
 																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("Toy Ball") ),
 																																			new PlayNode ( contextObject ),
 																																			new GoToObjectNode ( contextObject, GameObject.Find("Toy Ball") )
 																																		),
 																				/* Chase Toy Mouse Sequence */		new SequenceNode	(	contextObject,
+																																			new WaitNode (contextObject, 5F),
 																																			new CheckFunNode (contextObject),
 																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("Mouse")),
 																																			new PlayNode ( contextObject ),

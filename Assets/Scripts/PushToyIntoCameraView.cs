@@ -21,7 +21,7 @@ public class PushToyIntoCameraView : MonoBehaviour
 		
 		if (other_collider.CompareTag("toy"))
 		{
-			towardsOrigin = new Vector3(-1 * other_collider.gameObject.transform.position.x, 0, -1.1F * other_collider.gameObject.transform.position.z);
+			towardsOrigin = new Vector3(-1 * other_collider.gameObject.transform.position.x, 0, -1 * other_collider.gameObject.transform.position.z);
 			
 			// Apply force to move toy back into camera view
 			Debug.Log("Applying force.");
