@@ -238,7 +238,7 @@ public class Cat : BaseCat
 		// Log current state
 		//Debug.Log(activity);
         //Debug.Log(stats);
-		Debug.Log(achievements);
+		//Debug.Log(achievements);
     }
 	
 	// Coroutine to run BT once every set interval
@@ -254,10 +254,10 @@ public class Cat : BaseCat
 		waiting = true;
 		
 		// Traverse behavior trees
-		Debug.Log(string.Format("Running trees... Time = {0}", _startTime));
+		//Debug.Log(string.Format("Running trees... Time = {0}", _startTime));
 		autonomousCatBehaviorTree.run(_startTime);
 		userInteractionBehaviorTree.run(_startTime);
-		Debug.Log(string.Format("Finished running trees... Time = {0}", Time.time));
+		//Debug.Log(string.Format("Finished running trees... Time = {0}", Time.time));
 		
 		yield return new WaitForSeconds(BT_TRAVERSAL_INTERVAL);
 		
