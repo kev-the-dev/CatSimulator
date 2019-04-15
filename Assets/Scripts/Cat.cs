@@ -149,7 +149,7 @@ public class Cat : BaseCat
 																																		),
 																				/* Chase Toy Ball Sequence */		new SequenceNode	(	contextObject,
 																																			new CheckFunNode (contextObject),
-																																			new CoinFlipNode (contextObject, rng, 15F),
+																																			new CoinFlipNode (contextObject, rng, 30F),
 																																			new CheckObjectStatusNode ( contextObject, GameObject.Find("Toy Ball") ),
 																																			new PlayNode ( contextObject ),
 																																			new GoToObjectNode ( contextObject, GameObject.Find("Toy Ball") )
