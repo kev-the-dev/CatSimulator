@@ -5,11 +5,14 @@ using UnityEngine;
 public class PushToyIntoCameraView : MonoBehaviour
 {
 	Vector3 towardsOrigin;
+	Vector3 frontOfRoomPosition;
+	GameObject[] toys;
 	
     // Start is called before the first frame update
     void Start()
     {
-		
+		toys = GameObject.FindGameObjectsWithTag("toy");
+		frontOfRoomPosition = new Vector3(0F, -2.576599F, -9.8F);
     }
 	
 	void OnTriggerStay(Collider other_collider)
