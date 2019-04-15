@@ -275,10 +275,13 @@ public class GoToRandomPointNode : PrimitiveNode
 }
 
 public class SleepNode : PrimitiveNode
-{	
-	public SleepNode (Context _context) : base (_context)
+{
+	GameObject particles;
+
+	public SleepNode (Context _context, GameObject _particles) : base (_context)
 	{
-		
+		particles = _particles;
+		particles.SetActive(false);
 	}
 	
 	public override NodeStatus run (float _time)
@@ -286,6 +289,7 @@ public class SleepNode : PrimitiveNode
 		// If not already sleeping, go to sleep
 		if (contextObj.activity.current != CatActivityEnum.Sleeping)
 		{
+			particles.SetActive(true);
 			contextObj.activity.current = CatActivityEnum.Sleeping;
 		}
 		// If not fully rested, continue sleeping
@@ -295,6 +299,7 @@ public class SleepNode : PrimitiveNode
 		}
 		
 		// Make cat wake up
+		particles.SetActive(false);
 		contextObj.activity.current = CatActivityEnum.Idle;
 		return NodeStatus.Success;
 	}

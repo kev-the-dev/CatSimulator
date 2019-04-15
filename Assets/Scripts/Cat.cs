@@ -124,7 +124,7 @@ public class Cat : BaseCat
 		
 																				/* Energy Sequence */				new SequenceNode 	(	contextObject, 
 																																			new CheckEnergyNode ( contextObject ),
-																																			new SleepNode ( contextObject )
+																																			new SleepNode ( contextObject , GameObject.Find("SleepingParticles"))
 																																		),
 																				/* Bladder Sequence */				new SequenceNode	(	contextObject,
 																																			new CheckBladderNode ( contextObject ),
