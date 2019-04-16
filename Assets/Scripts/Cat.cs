@@ -25,6 +25,10 @@ public class Cat : BaseCat
 	bool forced_walk;
 	bool forced_sit;
 	
+	// Autosave
+	float last_autosave_time;
+	const float AUTOSAVE_PERIOD_SECONDS = 60F;
+
 	// Cat AI
 	BehaviorTree autonomousCatBehaviorTree;
 	BehaviorTree userInteractionBehaviorTree;
@@ -61,6 +65,7 @@ public class Cat : BaseCat
     // Start is called before the first frame update
     void Start()
     {
+		last_autosave_time = 0F;
 		// Initialize agent
 		agent = GetComponent<NavMeshAgent>();
 		// Initialize animator
@@ -179,6 +184,14 @@ public class Cat : BaseCat
     // Update is called once per frame
     void Update()
     {
+		// autosave if it's time
+		if (Time.time - last_autosave_time > AUTOSAVE_PERIOD_SECONDS)
+		{
+			Save();
+			last_autosave_time = Time.time;
+			Debug.Log("Autosaving");
+		}
+
 		// Set walking / sitting animiation
 		float velocity = agent.velocity.magnitude;
 		if (velocity < 0.2) {
