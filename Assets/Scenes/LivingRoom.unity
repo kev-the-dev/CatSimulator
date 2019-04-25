@@ -13110,11 +13110,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8043cc554c308648ae27b41d73ca0bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hand_cursor: {fileID: 2800000, guid: a4e0452e634080141bc2172bbe81fd30, type: 3}
-  brush_cursor: {fileID: 2800000, guid: 028d9d3b97f7f61479297504f7b1512c, type: 3}
-  food_cursor: {fileID: 2800000, guid: 13c79332b3ec8f2498e12a1b1a1a3844, type: 3}
-  laser_cursor: {fileID: 2800000, guid: 2878ee32a3d37614294d7b069c0e6401, type: 3}
-  litter_cursor: {fileID: 2800000, guid: 0933c8b13f9ab5f47b5ac26e3c0c1bd5, type: 3}
+  hand_cursor: {fileID: 2800000, guid: 0af8d80bbd3ed4a4b8201ef5f129bdad, type: 3}
+  brush_cursor: {fileID: 2800000, guid: 9fbc5d5b6c17df14e9659c651fdfc724, type: 3}
+  food_cursor: {fileID: 2800000, guid: 3c402256c52f597469dcd2a811bf415c, type: 3}
+  laser_cursor: {fileID: 2800000, guid: 5a5b423f564027a43b7ab53e2c9c6ccb, type: 3}
+  litter_cursor: {fileID: 2800000, guid: 4f8d409768bfc6b4abf0f5b0713eab03, type: 3}
 --- !u!195 &550002538
 NavMeshAgent:
   m_ObjectHideFlags: 0

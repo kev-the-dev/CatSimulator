@@ -20,6 +20,7 @@ public class Cat : BaseCat
 	// The cat's current activity/behavior/goal
 	CatActivity activity;
 	
+	// Animation variables
 	NavMeshAgent agent;
 	Animator animator;
 	bool forced_walk;
@@ -91,13 +92,16 @@ public class Cat : BaseCat
 		food_button = GameObject.Find("food_button").GetComponent<Button>();
 		laser_button = GameObject.Find("laser_button").GetComponent<Button>();
 		litter_button = GameObject.Find("litter_button").GetComponent<Button>();
+		
 		// Initialize listeners
 		hand_button.onClick.AddListener(delegate {SelectTool(SelectedTool.HAND);});
 		brush_button.onClick.AddListener(delegate {SelectTool(SelectedTool.BRUSH);});
 		food_button.onClick.AddListener(delegate {SelectTool(SelectedTool.FOOD);});
 		laser_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LASER_POINTER);});
 		litter_button.onClick.AddListener(delegate {SelectTool(SelectedTool.LITTER_SCOOPER);});
-		// Default to hand tool
+		
+		// Initialize tool to none, then set as hand tool
+		selected_tool = SelectedTool.NONE;
 		SelectTool(SelectedTool.HAND);
 
 		// Previous save should always exist (otherwise adoption center would be loaded)
@@ -293,28 +297,28 @@ public class Cat : BaseCat
 		// Log the change in tool
 		Debug.Log(string.Format("Selected Tool {0}", tool));
 		
-		Vector2 offset = new Vector2(0, 32);
+		Vector2 offset = new Vector2(0, 64);
 		
 		if (SelectedTool.HAND == tool)
 		{
-			Cursor.SetCursor(hand_cursor, offset, CursorMode.Auto);
+			Cursor.SetCursor(hand_cursor, offset, CursorMode.ForceSoftware);
 		} 
 		else if (SelectedTool.BRUSH == tool) 
 		{
-			Cursor.SetCursor(brush_cursor, offset, CursorMode.Auto);
+			Cursor.SetCursor(brush_cursor, offset, CursorMode.ForceSoftware);
 		} 
 		else if (SelectedTool.FOOD == tool) 
 		{
-			Cursor.SetCursor(food_cursor, offset, CursorMode.Auto);
+			Cursor.SetCursor(food_cursor, offset, CursorMode.ForceSoftware);
 		} 
 		else if (SelectedTool.LASER_POINTER == tool) 
 		{
-			Cursor.SetCursor(laser_cursor, offset, CursorMode.Auto);
+			Cursor.SetCursor(laser_cursor, offset, CursorMode.ForceSoftware);
 			laserPointer.SetActive(true);
 		}
 		else if (SelectedTool.LITTER_SCOOPER == tool)
 		{
-			Cursor.SetCursor(litter_cursor, offset, CursorMode.Auto);
+			Cursor.SetCursor(litter_cursor, offset, CursorMode.ForceSoftware);
 		}
 
 		selected_tool = tool;
